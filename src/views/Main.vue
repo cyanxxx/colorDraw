@@ -1,0 +1,175 @@
+<template lang="html">
+  <div id="entry">
+    <my-header class="blue">
+      <!-- <p>房间号：{{roomLists.roomId}}</p> -->
+      <p>用户名：{{userName}}</p>
+    </my-header>
+    <div class="room"
+         @touchstart="doAction('start', $event)"
+         @touchmove ="doAction('move', $event)"
+         @touchend = "doAction('end', $event)" >
+      <div class="container clearFix" ref="roomBox">
+        <circle-room class="circle green" :room = "roomLists[0]"></circle-room>
+        <circle-room class="circle blue" :room = "roomLists[1]"></circle-room>
+        <circle-room class="circle red" :room = "roomLists[2]"></circle-room>
+      </div>
+    </div>
+
+
+  </div>
+</template>
+
+<script>
+import CircleRoom from '../components/Circle'
+import MyHeader from '../components/MyHeader'
+
+export default {
+  components:{
+    CircleRoom,
+    MyHeader
+  },
+  data() {
+    return{
+      socketEvents:{
+        newUserJoin(data) {
+          this.roomLists.forEach((room) =>{
+            if(room.roomId == data.roomData.roomId){
+              room.userList = data.roomData.userList;
+              if(this.user.id == data.userData.id){
+                this.$store.commit('SAVE_USER',data.userData);
+              }
+
+            }
+          })
+        },
+        changeUserStatus(data) {
+          this.$store.commit('SAVE_USER',data);
+        },
+        startGame(data) {
+          this.$router.replace({name:'room',params:{id:data.roomId}})
+        }
+      },
+      roomLists:[],
+      startPos:{},
+      endPos:{},
+      minPos: 30,
+      maxTime: 500,
+      startTime:null,
+      endTime:null,
+      left:null,
+    }
+  },
+  created() {
+    //加载
+    this.$ws.request({},'login').then((data) => {
+      console.log(data)
+      this.$store.commit('SAVE_USER',data);
+    }).then(()=>{
+      this.$ws.request({},'getUserList').then((data) => {
+        this.roomLists = data;
+      });
+    })
+  },
+  mounted(){
+    var el = this.$refs.roomBox;
+    var left = parseFloat(window.getComputedStyle(el).left);
+    this.left = left;
+    this.$refs.roomBox.style.left = 0 + 'px';
+  },
+  computed:{
+    user() {
+      return this.$store.getters.user;
+    },
+    userName() {
+      return this.user && this.user.name;
+    }
+  },
+  methods:{
+    getPos(e) {
+      var pos = e.touches[0]
+      return {x: pos.clientX, y: pos.clientY}
+    },
+    getDistance(bp, ap){
+      var x = ap.x - bp.x;
+      var y = ap.y - bp.y;
+      console.log(x,y,Math.sqrt( x * x + y * y ))
+      return Math.sqrt( x * x + y * y );
+    },
+    getDirection(bp,ap){
+      var x = ap.x - bp.x;
+      var y = ap.y - bp.y;
+      var angel = Math.atan2(y,x) * 180 /Math.PI;
+      console.log(angel)
+      if(angel >= -45 && angel <= 45){
+        console.log("jo")
+        return 'right'
+      }else if(angel >= 135 || angel <= -135){
+        console.log("p")
+        return 'left'
+      }
+    },
+    translateRoom(type){
+      var left = parseFloat(this.$refs.roomBox.style.left);
+      switch(type){
+        case 'left':
+          this.$refs.roomBox.style.left = left + this.left +'px'
+          break;
+        case  'right':
+          this.$refs.roomBox.style.left = left - this.left +'px'
+          break;
+      }
+    },
+    doAction(type, $event){
+      switch(type){
+        case 'start':
+          this.startPos = this.getPos($event);
+          this.startTime = Date.now();
+          break;
+        case 'move':
+          this.endPos = this.getPos($event);
+          break;
+        case 'end':
+          this.endTime = Date.now();
+          if(this.endTime - this.startTime > this.maxTime || !this.endPos || this.getDistance(this.startPos, this.endPos) < this.minPos)return
+          this.translateRoom(this.getDirection(this.startPos, this.endPos))
+          this.startPos = null;
+          this.endPos = null;
+          break;
+      }
+
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+$width:640px;
+$left: 27px;
+$spacing:55px;
+#entry{
+  height: 100%;
+  .room{
+    height: calc(100% - 80px);
+  }
+}
+.room{
+position: relative;
+overflow: hidden;
+height: 640px;
+  .container{
+    position: relative;
+    top:50%;
+    transform: translateY(-50%);
+    width:( $width + $left ) * 3 + $left;
+    padding-left: $left;
+    left: -($left * 2 + $width -$left);
+    .circle{
+      float:left;
+      margin-left: $left;
+    }
+  }
+}
+
+
+
+</style>

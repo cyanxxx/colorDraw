@@ -1,0 +1,51 @@
+html, body{
+  margin: 0;
+  border: 0;
+  height: 100%;
+}
+input, textarea, body, button, a, p{
+  font-family: -apple-system,"Microsoft YaHei", "Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","WenQuanYi Micro Hei",sans-serif;
+  font-weight: 100;
+}
+*{
+  box-sizing: border-box;
+}
+.clearFix:after{
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+*{
+  margin:0;
+  padding:0;
+}
+
+@mixin theme($bg) {
+  color: #fff;
+  background: $bg
+}
+
+.green{
+  @include theme(#42c281);
+}
+.blue{
+  @include theme(#4284c2);
+}
+.red{
+  @include theme(#c25a42);
+}
+
+.fr{
+  float: right;
+}
+.fl{
+  float: left;
+}
