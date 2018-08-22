@@ -6,12 +6,16 @@ import router from './router'
 import store from './store'
 import webSocketSerive from './webSocketSerive'
 import FastClick from 'fastclick'
+import ProgressImg from './components/ProgressImg.vue'
+
+const bar = Vue.prototype.$bar = new Vue(ProgressImg).$mount()
+//挂载在body
+document.body.appendChild(bar.$el);
 
 Vue.config.productionTip = false
 Vue.prototype.$ws = new webSocketSerive();
 
 FastClick.attach(document.body);
-
 Vue.mixin({
   created () {
     const events = this.$data.socketEvents;

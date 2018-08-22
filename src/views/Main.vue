@@ -60,6 +60,7 @@ export default {
     }
   },
   created() {
+    this.$bar.on();
     //加载
     this.$ws.request({},'login').then((data) => {
       console.log(data)
@@ -67,14 +68,10 @@ export default {
     }).then(()=>{
       this.$ws.request({},'getUserList').then((data) => {
         this.roomLists = data;
+        this.getLeft();
+        this.$bar.off();
       });
     })
-  },
-  mounted(){
-    var el = this.$refs.roomBox;
-    var left = parseFloat(window.getComputedStyle(el).left);
-    this.left = left;
-    this.$refs.roomBox.style.left = 0 + 'px';
   },
   computed:{
     user() {
@@ -85,6 +82,13 @@ export default {
     }
   },
   methods:{
+    getLeft() {
+      var el = this.$refs.roomBox;
+      var left = parseFloat(window.getComputedStyle(el).left);
+      console.log(left)
+      this.left = left;
+      this.$refs.roomBox.style.left = 0 + 'px';
+    },
     getPos(e) {
       var pos = e.touches[0]
       return {x: pos.clientX, y: pos.clientY}
@@ -92,19 +96,15 @@ export default {
     getDistance(bp, ap){
       var x = ap.x - bp.x;
       var y = ap.y - bp.y;
-      console.log(x,y,Math.sqrt( x * x + y * y ))
       return Math.sqrt( x * x + y * y );
     },
     getDirection(bp,ap){
       var x = ap.x - bp.x;
       var y = ap.y - bp.y;
       var angel = Math.atan2(y,x) * 180 /Math.PI;
-      console.log(angel)
       if(angel >= -45 && angel <= 45){
-        console.log("jo")
         return 'right'
       }else if(angel >= 135 || angel <= -135){
-        console.log("p")
         return 'left'
       }
     },

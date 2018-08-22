@@ -1,5 +1,5 @@
 <template lang="html">
-  <div id="circle">
+  <div id="circle" ref="c">
     <div class="middle">
       <p>{{room.userList.length}}</p>
       <button type="button" :class="{disable: !canStart}" :disabled="!canStart" @click="gotoRoom">
@@ -9,9 +9,8 @@
         join
       </button>
     </div>
-    <div class="userInfo"
-         v-for = "(user, index) in room.userList"
-         :class="[index > 0? 'other':'','spin-'+(index+1)]">
+    <div class="userInfo spin"
+         v-for = "(user, index) in room.userList">
       <img :src="user.img" class="small" >
       <p class="ignore">{{user.name}}</p>
     </div>
@@ -23,7 +22,7 @@
 export default {
   data() {
     return{
-      member:0
+      circleR:0
     }
   },
   computed:{
@@ -36,6 +35,29 @@ export default {
     },
     canJoin() {
       return this.user && this.user.status == 'free'
+    },
+    length() {
+      //样式处理
+
+      return this.room.userList.length;
+    }
+  },
+  watch:{
+    length(val, ol) {
+      console.log(val);
+      this.$nextTick(function(){
+        var arr = Array.prototype.slice.call(document.querySelectorAll('.userInfo'));
+        var len = arr.length;
+        console.log(arr);
+        var r = this.circleR;
+        arr.forEach(function(el,i) {
+          //translate(-50%,-50%)
+          el.style.transform = `translate(-50%,-50%) rotate(${360/len*(i+1)}deg) translateY(-121px) rotate(${-360/len*(i+1)}deg)`;
+          //console.log(`translate(-50%,-50%) rotate(${360/len*i}deg) translateY(-121px) rotate(${360/len*i}deg)`)
+            console.log(el.style.transform);//rotate(360/${len}*${i})
+        })
+      })
+
     }
   },
   props:{
@@ -50,12 +72,15 @@ export default {
       }
     },
   },
+  mounted() {
+    this.circleR = this.$refs.c.offsetWidth / 2;
+  },
   methods:{
     gotoRoom() {
       this.$ws.sendMsg({}, 'startGame')
     },
     join() {
-      this.$ws.sendMsg({roomId:this.room.roomId},'join')
+      this.$ws.sendMsg({roomId:this.room.roomId},'join');
     }
   }
 
@@ -66,25 +91,25 @@ export default {
   $width:600px;
   $r: $width / 2;
   $img-width:100px;
-  @for $i from 1 through 8 {
-
-    @keyframes spin-#{$i} {
-      from {
-    		transform: rotate(0deg)
-    		           translateY(-$r) translateY(50%)
-    		           rotate(360deg)
-    	}
-    	to {
-    		transform: rotate($i * 45deg)
-    		           translateY(-$r) translateY(50%)
-    		           rotate(360deg -$i * 45deg);
-    	}
-    }
-    .spin-#{$i} {
-      animation:spin-#{$i} 3s linear;
-      animation-fill-mode: forwards;
-    }
-  }
+  // @for $i from 1 through 8 {
+  //
+  //   @keyframes spin-#{$i} {
+  //     from {
+  //   		transform: rotate(0deg)
+  //   		           translateY(-$r) translateY(50%)
+  //   		           rotate(360deg)
+  //   	}
+  //   	to {
+  //   		transform: rotate($i * 45deg)
+  //   		           translateY(-$r) translateY(50%)
+  //   		           rotate(360deg -$i * 45deg);
+  //   	}
+  //   }
+  //   .spin-#{$i} {
+  //     animation:spin-#{$i} 3s linear;
+  //     animation-fill-mode: forwards;
+  //   }
+  // }
 
   #circle{
     width: $width;
@@ -107,9 +132,13 @@ export default {
     }
     .userInfo{
       display: block;
-      margin:calc(50% - 76px) auto 0;
+      position: absolute;
+      top:50%;
+      left:50%;
+      transform: translate(-50%,-50%);
       width:100px;
       text-align: center;
+      transition: transform 1s linear;
       .small{
         display: block;
         width:100px;
@@ -143,16 +172,17 @@ export default {
       color:#bababa;
     }
   }
-  @keyframes spin {
-	from {
-		transform: rotate(0deg)
-		           translateY(-$r) translateY(50%)
-		           rotate(360deg)
-	}
-	to {
-		transform: rotate(360deg)
-		           translateY(-$r) translateY(50%)
-		           rotate(0deg);
-	}
-}
+
+  // @keyframes spin {
+	// from {
+	// 	transform: rotate(0deg)
+	// 	           translateY(-$r) translateY(50%)
+	// 	           rotate(360deg)
+	// }
+	// to {
+	// 	transform: rotate(360deg)
+	// 	           translateY(-$r) translateY(50%)
+	// 	           rotate(0deg);
+	// }
+//}
 </style>
