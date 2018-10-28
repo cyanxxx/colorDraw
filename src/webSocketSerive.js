@@ -1,18 +1,16 @@
 import store from './store'
+
 const options = {
   path:' ws://192.168.1.106:9090'
 }
 
 export default class WebSocketSerive{
-  constructor() {
+  constructor(config) {
     this.ws = new window.WebSocket(options.path);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
     this.ws.onopen = ()=>{
-      this.request({},'login').then((data) => {
-        console.log(data)
-        store.commit('SAVE_USER',data);
-      })
+      config.open.apply(this)
     }
   }
 
