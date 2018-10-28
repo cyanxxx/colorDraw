@@ -61,17 +61,14 @@ export default {
   },
   created() {
     this.$bar.on();
+    this.$tip.msg('获取房间中...')
     //加载
-    this.$ws.request({},'login').then((data) => {
-      console.log(data)
-      this.$store.commit('SAVE_USER',data);
-    }).then(()=>{
       this.$ws.request({},'getUserList').then((data) => {
         this.roomLists = data;
         this.getLeft();
         this.$bar.off();
+        this.$tip.finish()
       });
-    })
   },
   computed:{
     user() {

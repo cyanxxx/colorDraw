@@ -3,10 +3,13 @@
     <div class="middle">
       <p>{{room.userList.length}}</p>
       <button type="button" :class="{disable: !canStart}" :disabled="!canStart" @click="gotoRoom">
-        start
+        START
       </button>
       <button type="button" :class="{disable: !canJoin}" :disabled="!canJoin" @click="join">
-        join
+        JOIN
+      </button>
+      <button type="button" :class="{disable: !canExit}" :disabled="!canExit" @click="exit">
+        EXIT
       </button>
     </div>
     <div class="userInfo spin"
@@ -35,6 +38,9 @@ export default {
     },
     canJoin() {
       return this.user && this.user.status == 'free'
+    },
+    canExit() {
+      return this.user && this.user.roomId == this.room.roomId;
     },
     length() {
       //样式处理
@@ -81,6 +87,9 @@ export default {
     },
     join() {
       this.$ws.sendMsg({roomId:this.room.roomId},'join');
+    },
+    exit() {
+      this.$ws.sendMsg({},'exitRoom');
     }
   }
 

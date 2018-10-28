@@ -1,5 +1,6 @@
+import store from './store'
 const options = {
-  path:' ws://localhost:9090'
+  path:' ws://192.168.1.106:9090'
 }
 
 export default class WebSocketSerive{
@@ -7,6 +8,12 @@ export default class WebSocketSerive{
     this.ws = new window.WebSocket(options.path);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
+    this.ws.onopen = ()=>{
+      this.request({},'login').then((data) => {
+        console.log(data)
+        store.commit('SAVE_USER',data);
+      })
+    }
   }
 
   sendMsg(data, type) {
@@ -45,7 +52,6 @@ export default class WebSocketSerive{
   }
 
   on(type,fn) {
-    console.log(type, fn)
     this.events[type] = fn;
   }
 
@@ -59,7 +65,6 @@ export default class WebSocketSerive{
 
   getWsMes(data){
     var json = JSON.parse(data.data);
-    console.log(json);
     this.events[json.type](json.data);   //调用相关函数，并放入数据
   }
 }
