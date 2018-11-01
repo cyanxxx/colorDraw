@@ -14,8 +14,6 @@
         <circle-room class="circle red" :room = "roomLists[2]"></circle-room>
       </div>
     </div>
-
-
   </div>
 </template>
 
