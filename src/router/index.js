@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Room from '../views/Room.vue'
 import Main from '../views/Main.vue'
+import store from '../store'
+import {GAMING} from '../utils/constant'
 
 Vue.use(Router)
 
@@ -15,7 +17,15 @@ export default new Router({
     {
       path:'/room:id',
       name:"room",
-      component:Room
+      component:Room,
+      //开始游戏
+      beforeEnter(){
+        if(store.getters.status === 'GAMING'){
+          next()
+        }else{
+          next({path:"/"})
+        }
+      }
     }
   ]
 })
