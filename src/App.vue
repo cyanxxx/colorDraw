@@ -15,4 +15,7 @@ export default {
   #app{
     height: 100%;
   }
+  body{
+    overflow: hidden;
+  }
 </style>
