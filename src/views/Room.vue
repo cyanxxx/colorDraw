@@ -16,8 +16,10 @@
                :playerLists="lists"
                :imgLists = "imgMap"
      />
-    <member class="theme" :lists = "gameData.playerList" :currentId = "gameData.currentPlayer.id"></member>
-    <comment :msgBox="comMes" @send-msg = "wsMsg" class="comment"></comment>
+     <footer class='bottom'>
+       <member class="theme" :lists = "gameData.playerList" :currentId = "gameData.currentPlayer.id"></member>
+       <comment :msgData="comMes" @send-msg = "wsMsg" class="comment"></comment>
+     </footer>
     <div class="laywer" v-show = "gameData.status == 'over' || gameData.status == 'finish'"></div>
   </div>
 
@@ -136,7 +138,7 @@ export default {
     color:#fff;
     padding:16px;
   }
-  .comment{
+  .bottom{
     width: 100%;
     position: fixed;
     bottom: 0;
