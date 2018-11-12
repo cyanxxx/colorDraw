@@ -115,6 +115,8 @@ export default {
       }
     },
     doAction(type, $event){
+      $event.preventDeafult();
+      $event.stopPropagation();
       switch(type){
         case 'start':
           this.startPos = this.getPos($event);
