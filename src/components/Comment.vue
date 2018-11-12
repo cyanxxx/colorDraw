@@ -1,7 +1,7 @@
 <template lang="html">
   <div id="comment" class="clearFix">
     <div class="showmsg ignore" ref="msgLists">
-      <p class="msg" v-for="msg in msgBox">
+      <p class="msg" v-for="msg in msgData">
         {{ msg }}
       </p>
     </div>
@@ -19,29 +19,45 @@ export default {
   data() {
     return {
       text:"",
+      aniamted: false,
+      aniName: 'active',
     }
   },
   watch:{
-    msgBox:{
-      handler(){
-        if(this.msgBox.length){
-          this.$nextTick(()=>{
-            console.log(this.$refs.msgLists.firstElementChild)
-            this.$refs.msgLists.firstElementChild.classList.add("active");
-            setTimeout(()=>{
-              this.msgBox.pop();
-            },5000)
-          })
-        }
-      },
+    // msgBox:{
+    //   handler(){
+    //     if(this.msgBox.length){
+    //       this.initAnim()
+    //     }
+    //   },
+    // }   1 0   2 1  3 2      3 - 2 = 1
+    msgData: function(newVal, oldVal){
+      var domArr = [].prototype.slice.call(newVal);
+      if(newVal.length > oldVal.length){
+        this.initAnim(domArr.slice(newVal.length-oldVal.length + 1))
+      }
     }
   },
   props:{
-    msgBox:{
+    domData:{
       type:Array
     }
   },
+  mounted() {
+    var domArr = [].prototype.slice.call(this.$refs.msgLists);
+    this.initAnim(domArr)
+  },
   methods:{
+    //1.新增数据加样式  2  3
+    //2.删去dom节点
+    initAnim(domArr) {
+      domArr.forEach((el, i )=>{
+        el.style.animationDuration = i + 1 +'s'
+        el.addEventListner('webkitAnimationEnd',()=>{
+          this.domData.pop();
+        })
+      })
+    },
     send(msg) {
       this.text = "";
       var data = {
@@ -102,7 +118,7 @@ export default {
     }
   }
   @keyframes scroll{
-    from {transform: translateX(750px);opacity: 1;}
+    from {transform: translateX(100vw);opacity: 1;}
     to {transform: translateX(-100%);opacity: 1;}
   }
 </style>
