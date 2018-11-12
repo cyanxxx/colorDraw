@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import {OVER, WAITING} from './utils/constant'
 import MyHeader from '../components/MyHeader.vue'
 import Member from '../components/Member.vue'
 import Comment from '../components/Comment.vue'
@@ -77,6 +78,27 @@ export default {
         },
         getcomMes(data) {
           this.comMes.push(data);
+        },
+        reconnect(data) {
+          //如果是画家
+          this.key = data.key
+          this.countTime = data.countTime
+          this.playList = data.playerList
+          //如果是玩家
+          this.key = data.key
+          this.countTime = data.countTime
+          this.playList = data.playerList
+        },
+        //有人离线和有人重连回来
+        refreshOneStatus(data) {
+          //处理离线
+          this.playerList = this.playerList.filter((el)=>{
+            if(el.id===data.id){
+              el.status = data.status
+            }
+            return el.id !== data.id
+          })
+          //处理重连
         },
         getGameData(data) {
           this.gameData = data;
