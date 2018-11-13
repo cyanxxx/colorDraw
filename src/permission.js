@@ -5,11 +5,11 @@ import LS from './utils/LocalStorage'
 import webSocketSerive from './webSocketSerive'
 import bar from './bar'
 import tip from './tip'
-
+const test = true
 router.beforeEach((to, from, next) => {
   bar.on()
   tip.msg('加载中...')
-  if(Vue.prototype.$ws){
+  if(Vue.prototype.$ws || test){
     next()
   }else{
     Vue.prototype.$ws = new webSocketSerive({
