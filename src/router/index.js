@@ -7,7 +7,7 @@ import store from '../store'
 import {GAMING} from '../utils/constant'
 
 Vue.use(Router)
-var test = true
+
 export default new Router({
   mode: 'history',
   routes: [
@@ -21,7 +21,7 @@ export default new Router({
       component:Room,
       //开始游戏
       beforeEnter: (to, from, next)=>{
-        if(store.getters.status === 'GAMING' || test){
+        if(store.getters.status === 'GAMING'){
           next()
         }else{
           next({path:"/"})
