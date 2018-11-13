@@ -59,77 +59,80 @@ export default {
           score:0
         },
         status:'',
-        playerList:[],
+        playerList:[
+          {id:1,name:'hauhua',score:1},
+          {id:1,name:'hauhua',score:1}
+        ],
         key:''
       },
       currentPlayerTip:false,
       imgMap:[],
       countTime:60,
       lists:[], //总分排名
-      socketEvents:{
-        timeOut(time) {
-          this.countTime = time;
-        },
-        getKey(data) {
-          this.key = data;
-        },
-        getTip(data) {
-          this.tip = data;
-        },
-        getcomMes(data) {
-          this.comMes.push(data);
-        },
-        reconnect(data) {
-          //如果是画家
-          this.key = data.key
-          this.countTime = data.countTime
-          this.playList = data.playerList
-          //如果是玩家
-          this.key = data.key
-          this.countTime = data.countTime
-          this.playList = data.playerList
-        },
-        //有人离线和有人重连回来
-        refreshOneStatus(data) {
-          //处理离线
-          this.playerList = this.playerList.filter((el)=>{
-            if(el.id===data.id){
-              el.status = data.status
-            }
-            return el.id !== data.id
-          })
-          //处理重连
-        },
-        getGameData(data) {
-          this.gameData = data;
-          setTimeout(()=>{
-            this.currentPlayerTip = 'gaming'
-          },3 * 1000);
-
-        },
-        gameOver(data) {
-          this.gameData.status = data.status;
-          this.imgMap = data.roundImgs;
-          this.lists = data.playerList;
-
-        },
-        roundFinish(data) {
-          this.key = data.key;
-          this.gameData.status = data.status;
-          this.$refs.draw.saveRoundImg();
-          this.$refs.draw.reset();
-          this.tip = "";
-        },
-        getScore(data){
-          this.gameData.playerList.forEach((user) => {
-            if(user.id == this.gameData.currentPlayer.id){
-              user.score = data.drawerScore;
-            }else if(user.id == data.ans.id){
-              user.score = data.ans.score
-            }
-          })
-        }
-      }
+      // socketEvents:{
+      //   timeOut(time) {
+      //     this.countTime = time;
+      //   },
+      //   getKey(data) {
+      //     this.key = data;
+      //   },
+      //   getTip(data) {
+      //     this.tip = data;
+      //   },
+      //   getcomMes(data) {
+      //     this.comMes.push(data);
+      //   },
+      //   reconnect(data) {
+      //     //如果是画家
+      //     this.key = data.key
+      //     this.countTime = data.countTime
+      //     this.playList = data.playerList
+      //     //如果是玩家
+      //     this.key = data.key
+      //     this.countTime = data.countTime
+      //     this.playList = data.playerList
+      //   },
+      //   //有人离线和有人重连回来
+      //   refreshOneStatus(data) {
+      //     //处理离线
+      //     this.playerList = this.playerList.filter((el)=>{
+      //       if(el.id===data.id){
+      //         el.status = data.status
+      //       }
+      //       return el.id !== data.id
+      //     })
+      //     //处理重连
+      //   },
+      //   getGameData(data) {
+      //     this.gameData = data;
+      //     setTimeout(()=>{
+      //       this.currentPlayerTip = 'gaming'
+      //     },3 * 1000);
+      //
+      //   },
+      //   gameOver(data) {
+      //     this.gameData.status = data.status;
+      //     this.imgMap = data.roundImgs;
+      //     this.lists = data.playerList;
+      //
+      //   },
+      //   roundFinish(data) {
+      //     this.key = data.key;
+      //     this.gameData.status = data.status;
+      //     this.$refs.draw.saveRoundImg();
+      //     this.$refs.draw.reset();
+      //     this.tip = "";
+      //   },
+      //   getScore(data){
+      //     this.gameData.playerList.forEach((user) => {
+      //       if(user.id == this.gameData.currentPlayer.id){
+      //         user.score = data.drawerScore;
+      //       }else if(user.id == data.ans.id){
+      //         user.score = data.ans.score
+      //       }
+      //     })
+      //   }
+      // }
     }
   },
   computed:{
@@ -143,12 +146,12 @@ export default {
   },
   created() {
     var id = this.user.id;
-    this.$ws.sendMsg({id},'beginGame')
+    // this.$ws.sendMsg({id},'beginGame')
   },
   methods: {
-    wsMsg(data) {
-      this.$ws.sendMsg(data, 'checkAnswer')
-    }
+    // wsMsg(data) {
+    //   this.$ws.sendMsg(data, 'checkAnswer')
+    // }
   }
 
 }

@@ -1,0 +1,59 @@
+1.大厅
+  *login
+    session_id
+      Y:data{
+        name,img,status
+      }
+      N: data{
+        inGame
+      }
+  *getRoomList  //双向
+    data{
+      roomsMap{
+        userList
+      }
+    }
+    *newUserJoin
+      data{
+        userList,roomId
+      }
+    *changeUserStatus //当前玩家状态
+      data{
+        id,status
+      }
+    *sbStatusChage{
+      data{
+        user
+      }
+    }
+    *startGame
+      data{
+        roomId
+      }
+2.游戏
+  *getKey
+    data{
+      key
+    }
+  *getTip
+      data{
+        tip
+      }
+  *getcomMes
+    data{
+      msg
+    }
+  *getGameData
+    data{
+      playerData,GameData
+    }
+  *reconnect
+    找getGameData
+  *refreshOneStatus //断线或重连
+    data{
+      id,status
+    }
+  *gameOver
+    data{
+      imgMap(每局画像),status,list(玩家分数和信息)
+    }
