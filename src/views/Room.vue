@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {OVER, WAITING} from './utils/constant'
+import {OVER, WAITING} from '@/utils/constant'
 import MyHeader from '../components/MyHeader.vue'
 import Member from '../components/Member.vue'
 import Comment from '../components/Comment.vue'
