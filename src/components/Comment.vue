@@ -1,9 +1,9 @@
 <template lang="html">
   <div id="comment" class="clearFix">
     <div class="showmsg ignore" ref="msgLists">
-      <p class="msg" v-for="msg in msgData">
+      <span class="msg" v-for="msg in msgData">
         {{ msg }}
-      </p>
+      </span>
     </div>
     <div class="clearFix sendMsg">
       <input type="text" v-model="text">
@@ -20,7 +20,7 @@ export default {
     return {
       text:"",
       aniamted: false,
-      aniName: 'active',
+      aniName: 'active'
     }
   },
   watch:{
@@ -32,30 +32,35 @@ export default {
     //   },
     // }   1 0   2 1  3 2      3 - 2 = 1
     msgData: function(newVal, oldVal){
-      var domArr = [].prototype.slice.call(newVal);
+      var domArr = Array.prototype.slice.call(newVal);
       if(newVal.length > oldVal.length){
         this.initAnim(domArr.slice(newVal.length-oldVal.length + 1))
       }
     }
   },
   props:{
-    domData:{
+    msgData:{
       type:Array
     }
   },
   mounted() {
-    var domArr = [].prototype.slice.call(this.$refs.msgLists);
+    var domArr = Array.prototype.slice.call(this.$refs.msgLists.children);
     this.initAnim(domArr)
   },
   methods:{
     //1.新增数据加样式  2  3
     //2.删去dom节点
     initAnim(domArr) {
+      console.log(domArr)
       domArr.forEach((el, i )=>{
-        el.style.animationDuration = i + 1 +'s'
-        el.addEventListner('webkitAnimationEnd',()=>{
-          this.domData.pop();
-        })
+        console.log(el,i)
+        el.classList.add('active')
+        el.style.animationDelay = i*2 +'s'
+        if(i===domArr.length-1){
+          el.addEventListener('webkitAnimationEnd',()=>{
+            this.msgData = [];
+          })
+        }
       })
     },
     send(msg) {
@@ -111,6 +116,7 @@ export default {
   }
   .msg{
     opacity: 0;
+    position: absolute;
     display: inline-block;
     color:#4284c2;
     &.active{
