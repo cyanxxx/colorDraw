@@ -5,7 +5,7 @@
       <p class="fr">{{countTime}}</p>
     </my-header>
     <draw :canDraw = "iscurrentPlay" ref="draw"></draw>
-    <float-bar class="theme" v-show="currentPlayerTip == 'game' && gameData.currentPlayer.id != user.id">
+    <float-bar class="theme" v-show="currentPlayerTip && !iscurrentPlay">
       <p>轮到:{{gameData.currentPlayer.name}}画</p>
     </float-bar>
     <float-bar class="theme" v-show="gameData.status == 'finish'">
@@ -80,38 +80,26 @@ export default {
           this.comMes.push(data);
         },
         reconnect(data) {
-          //如果是画家
-          this.key = data.key
-          this.countTime = data.countTime
-          this.playList = data.playerList
-          //如果是玩家
-          this.key = data.key
-          this.countTime = data.countTime
-          this.playList = data.playerList
+          this.gameData = data
         },
         //有人离线和有人重连回来
         refreshOneStatus(data) {
-          //处理离线
-          this.playerList = this.playerList.filter((el)=>{
-            if(el.id===data.id){
-              el.status = data.status
-            }
-            return el.id !== data.id
-          })
-          //处理重连
+          if(data.type === RECONNECT){
+            this.gameData.playerList.splice(data.userIndex,0,data.user)
+          }else if(data.type === LEAVING){
+            this.gameData.playerList.splice(data.userIndex,1,data.user)
+          }
         },
         getGameData(data) {
           this.gameData = data;
           setTimeout(()=>{
-            this.currentPlayerTip = 'gaming'
+            this.currentPlayerTip = true
           },3 * 1000);
-
         },
         gameOver(data) {
           this.gameData.status = data.status;
           this.imgMap = data.roundImgs;
           this.lists = data.playerList;
-
         },
         roundFinish(data) {
           this.key = data.key;
@@ -119,6 +107,7 @@ export default {
           this.$refs.draw.saveRoundImg();
           this.$refs.draw.reset();
           this.tip = "";
+          this.currentPlayerTip = false;
         },
         getScore(data){
           this.gameData.playerList.forEach((user) => {
