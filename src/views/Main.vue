@@ -30,18 +30,23 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
+          //新增的那个人数据，如果是同id就改状态，都会放入用户列表
           this.roomLists.forEach((room) =>{
             if(room.roomId == data.roomData.roomId){
-              room.userList = data.roomData.userList;
+              //加入新成员
+              room.userList.push(data.uerData)
+              //添加用户数据
               if(this.user.id == data.userData.id){
-                this.$store.commit('SAVE_USER',data.userData);
+                //并记录下他在哪个房间
+                this.room = data.roomData
+                //直接改状态
+                this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
               }
-
             }
           })
         },
-        changeUserStatus(data) {
-          this.$store.commit('SAVE_USER',data);
+        sbLeaveRoom(data) {
+          this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
         },
         startGame(data) {
           this.$router.replace({name:'room',params:{id:data.roomId}})
@@ -77,6 +82,9 @@ export default {
     }
   },
   methods:{
+    getUserRoom() {
+
+    },
     getLeft() {
       var el = this.$refs.roomBox;
       var left = parseFloat(window.getComputedStyle(el).left);
