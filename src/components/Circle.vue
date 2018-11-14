@@ -74,7 +74,7 @@ export default {
         return {
           roomId:null,
           userList:[],
-          status:0
+          status:FREE
         }
       }
     },
