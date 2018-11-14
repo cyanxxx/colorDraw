@@ -15,15 +15,15 @@
     }
     *newUserJoin
       data{
-        userList,roomId
+        user
       }
     *changeUserStatus //当前玩家状态
       data{
         id,status
       }
-    *sbStatusChage{
+    *sbLeaveRoom{ //有人离开了房间
       data{
-        user
+        roomIndex,userIndex
       }
     }
     *startGame
