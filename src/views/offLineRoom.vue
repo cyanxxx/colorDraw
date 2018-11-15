@@ -35,6 +35,7 @@ import Draw from '../components/Draw.vue'
 import FloatBar from '../components/FloatBar.vue'
 import GameOver from '../components/GameOver.vue'
 import { mapGetters } from 'vuex'
+import pic from '@/assets/image/1.jpg'
 
 export default {
   components:{
@@ -48,7 +49,7 @@ export default {
 
   data() {
     return {
-      comMes: [],
+      comMes: ['hhhhh','122'],
       key: "",
       tip: "",
       gameData:{
@@ -60,7 +61,7 @@ export default {
         },
         status:'',
         playerList:[
-          {id:1,name:'hauhua',score:1},
+          {id:1,name:'hauhua',score:1,offline:true,img:pic},
           {id:1,name:'hauhua',score:1}
         ],
         key:''
@@ -137,15 +138,14 @@ export default {
   },
   computed:{
     ...mapGetters(['user']),
-    iscurrentPlay() {
-      if(this.gameData.currentPlayer){
-        return this.user.id == this.gameData.currentPlayer.id
-      }
-
-    }
+    // iscurrentPlay() {
+    //   if(this.gameData.currentPlayer){
+    //     return this.user.id == this.gameData.currentPlayer.id
+    //   }
+    // }
   },
   created() {
-    var id = this.user.id;
+    //var id = this.user.id;
     // this.$ws.sendMsg({id},'beginGame')
   },
   methods: {
