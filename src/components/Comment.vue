@@ -77,13 +77,13 @@ export default {
 <style lang="scss" scoped>
 #comment{
   background: #fff;
-  margin-top: 16px;
+  padding-top: 16px;
 }
 .ignore{
   font-size: 14px;
 }
   .showmsg{
-    margin-bottom: 10px;
+    padding-bottom: 10px;
     background: #fff;
     color:#000;
     height: 44px;
