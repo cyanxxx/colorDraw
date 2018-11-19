@@ -20,7 +20,8 @@
 <script>
 import CircleRoom from '../components/Circle'
 import MyHeader from '../components/MyHeader'
-
+import { mapMutations } from 'vuex';
+import { FREE } from '@/utils/constant'
 export default {
   components:{
     CircleRoom,
@@ -50,6 +51,9 @@ export default {
         },
         startGame(data) {
           this.$router.replace({name:'room',params:{id:data.roomId}})
+        },
+        exitRoom(data) {
+          this.CHANGE_USER_STATUS(FREE)
         }
       },
       roomLists:[],
@@ -66,7 +70,7 @@ export default {
     this.$bar.on();
     this.$tip.msg('获取房间中...')
     //加载
-      this.$ws.request({},'getUserList').then((data) => {
+      this.$ws.request({},'getRoomData').then((data) => {
         this.roomLists = data;
         this.getLeft();
         this.$bar.off();
@@ -82,6 +86,7 @@ export default {
     }
   },
   methods:{
+    ...mapMutations(['CHANGE_USER_STATUS']),
     getUserRoom() {
 
     },
