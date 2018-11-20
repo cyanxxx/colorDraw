@@ -87,7 +87,8 @@ export default {
       this.$ws.sendMsg({}, 'startGame')
     },
     join() {
-      this.$ws.sendMsg({roomId:this.room.roomId},'join');
+      this.$emit('join-room',this.room.roomId)
+      
     },
     exit() {
       this.$ws.sendMsg({},'exitRoom');

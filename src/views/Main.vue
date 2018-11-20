@@ -9,7 +9,7 @@
          @touchmove ="doAction('move', $event)"
          @touchend = "doAction('end', $event)" >
       <div class="container clearFix" ref="roomBox">
-        <circle-room class="circle green" :room = "roomLists[0]"></circle-room>
+        <circle-room class="circle green" :room = "roomLists[0]" @join-room='join'></circle-room>
         <circle-room class="circle blue" :room = "roomLists[1]"></circle-room>
         <circle-room class="circle red" :room = "roomLists[2]"></circle-room>
       </div>
@@ -31,20 +31,25 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
-          //新增的那个人数据，如果是同id就改状态，都会放入用户列表
-          this.roomLists.forEach((room) =>{
-            if(room.roomId == data.roomData.roomId){
-              //加入新成员
-              room.userList.push(data.uerData)
-              //添加用户数据
-              if(this.user.id == data.userData.id){
-                //并记录下他在哪个房间
-                this.room = data.roomData
-                //直接改状态
-                this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
+          if(!this.hasRoomList){
+            this.roomLists = data.roomLists
+          }else{
+              //新增的那个人数据，如果是同id就改状态，都会放入用户列表
+            this.roomLists.forEach((room) =>{
+              if(room.roomId == data.roomData.roomId){
+                //加入新成员
+                room.userList.push(data.uerData)
+                //添加用户数据
+                if(this.user.id == data.userData.id){
+                  //并记录下他在哪个房间
+                  this.room = data.roomData
+                  //直接改状态
+                  this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
+                }
               }
-            }
-          })
+            })
+          }
+        
         },
         sbLeaveRoom(data) {
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
@@ -83,12 +88,18 @@ export default {
     },
     userName() {
       return this.user && this.user.name;
+    },
+    hasRoomList() {
+      return this.roomLists.length > 0
     }
   },
   methods:{
     ...mapMutations(['CHANGE_USER_STATUS']),
     getUserRoom() {
 
+    },
+    join(roomId) {
+      this.$ws.sendMsg({roomId, firstTime: this.hasRoomList},'join');
     },
     getLeft() {
       var el = this.$refs.roomBox;
@@ -128,8 +139,6 @@ export default {
       }
     },
     doAction(type, $event){
-      $event.preventDeafult();
-      $event.stopPropagation();
       switch(type){
         case 'start':
           this.startPos = this.getPos($event);

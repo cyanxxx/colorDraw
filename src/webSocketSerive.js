@@ -1,7 +1,7 @@
 import store from './store'
 
 const options = {
-  path:' ws://192.168.1.107:9090'
+  path:' ws://192.168.0.150:9090'
 }
 
 export default class WebSocketSerive{

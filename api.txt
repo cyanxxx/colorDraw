@@ -13,6 +13,7 @@
         userList
       }
     }
+    //同时进来的时候，还没加入，如果直接返回roomlist就不知道了
     *newUserJoin
       data{
         user
