@@ -9,20 +9,19 @@
          @touchmove ="doAction('move', $event)"
          @touchend = "doAction('end', $event)" >
       <div class="container clearFix" ref="roomBox">
-        <circle-room class="circle green" :room = "roomLists[0]"></circle-room>
+        <circle-room class="circle green" :room = "roomLists[0]" @join-room='join'></circle-room>
         <circle-room class="circle blue" :room = "roomLists[1]"></circle-room>
         <circle-room class="circle red" :room = "roomLists[2]"></circle-room>
       </div>
     </div>
-
-
   </div>
 </template>
 
 <script>
 import CircleRoom from '../components/Circle'
 import MyHeader from '../components/MyHeader'
-
+import { mapMutations } from 'vuex';
+import { FREE } from '@/utils/constant'
 export default {
   components:{
     CircleRoom,
@@ -32,21 +31,31 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
-          this.roomLists.forEach((room) =>{
-            if(room.roomId == data.roomData.roomId){
-              room.userList = data.roomData.userList;
-              if(this.user.id == data.userData.id){
-                this.$store.commit('SAVE_USER',data.userData);
-              }
-
+        console.log(data.roomId)
+        //新增的那个人数据，如果是同id就改状态，都会放入用户列表
+        this.roomLists.forEach((room) =>{
+          if(room.roomId == data.roomId){
+            //加入新成员
+            room.userList.push(data.userData)
+            console.log(room.userList)
+            //添加用户数据
+            if(this.user.id == data.userData.id){
+              //并记录下他在哪个房间
+              this.room = data.roomId
+              //直接改状态
+              this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
             }
-          })
+          }
+        })
         },
-        changeUserStatus(data) {
-          this.$store.commit('SAVE_USER',data);
+        sbLeaveRoom(data) {
+          this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
         },
         startGame(data) {
           this.$router.replace({name:'room',params:{id:data.roomId}})
+        },
+        exitRoom(data) {
+          this.CHANGE_USER_STATUS(FREE)
         }
       },
       roomLists:[],
@@ -63,7 +72,7 @@ export default {
     this.$bar.on();
     this.$tip.msg('获取房间中...')
     //加载
-      this.$ws.request({},'getUserList').then((data) => {
+      this.$ws.request({},'getRoomData').then((data) => {
         this.roomLists = data;
         this.getLeft();
         this.$bar.off();
@@ -76,9 +85,19 @@ export default {
     },
     userName() {
       return this.user && this.user.name;
+    },
+    hasRoomList() {
+      return this.roomLists.length > 0
     }
   },
   methods:{
+    ...mapMutations(['CHANGE_USER_STATUS']),
+    getUserRoom() {
+
+    },
+    join(roomId) {
+      this.$ws.sendMsg({roomId, firstTime: this.hasRoomList},'join');
+    },
     getLeft() {
       var el = this.$refs.roomBox;
       var left = parseFloat(window.getComputedStyle(el).left);

@@ -1,9 +1,9 @@
 <template lang="html">
   <div id="comment" class="clearFix">
     <div class="showmsg ignore" ref="msgLists">
-      <p class="msg" v-for="msg in msgBox">
+      <span class="msg" v-for="msg in msgData">
         {{ msg }}
-      </p>
+      </span>
     </div>
     <div class="clearFix sendMsg">
       <input type="text" v-model="text">
@@ -19,29 +19,50 @@ export default {
   data() {
     return {
       text:"",
+      aniamted: false,
+      aniName: 'active'
     }
   },
   watch:{
-    msgBox:{
-      handler(){
-        if(this.msgBox.length){
-          this.$nextTick(()=>{
-            console.log(this.$refs.msgLists.firstElementChild)
-            this.$refs.msgLists.firstElementChild.classList.add("active");
-            setTimeout(()=>{
-              this.msgBox.pop();
-            },5000)
-          })
-        }
-      },
+    // msgBox:{
+    //   handler(){
+    //     if(this.msgBox.length){
+    //       this.initAnim()
+    //     }
+    //   },
+    // }   1 0   2 1  3 2      3 - 2 = 1
+    msgData: function(newVal, oldVal){
+      var domArr = Array.prototype.slice.call(newVal);
+      if(newVal.length > oldVal.length){
+        this.initAnim(domArr.slice(newVal.length-oldVal.length + 1))
+      }
     }
   },
   props:{
-    msgBox:{
+    msgData:{
       type:Array
     }
   },
+  mounted() {
+    var domArr = Array.prototype.slice.call(this.$refs.msgLists.children);
+    this.initAnim(domArr)
+  },
   methods:{
+    //1.新增数据加样式  2  3
+    //2.删去dom节点
+    initAnim(domArr) {
+      console.log(domArr)
+      domArr.forEach((el, i )=>{
+        console.log(el,i)
+        el.classList.add('active')
+        el.style.animationDelay = i*2 +'s'
+        if(i===domArr.length-1){
+          el.addEventListener('webkitAnimationEnd',()=>{
+            this.msgData = [];
+          })
+        }
+      })
+    },
     send(msg) {
       this.text = "";
       var data = {
@@ -56,13 +77,13 @@ export default {
 <style lang="scss" scoped>
 #comment{
   background: #fff;
-  margin-top: 16px;
+  padding-top: 16px;
 }
 .ignore{
   font-size: 14px;
 }
   .showmsg{
-    margin-bottom: 10px;
+    padding-bottom: 10px;
     background: #fff;
     color:#000;
     height: 44px;
@@ -95,6 +116,7 @@ export default {
   }
   .msg{
     opacity: 0;
+    position: absolute;
     display: inline-block;
     color:#4284c2;
     &.active{
@@ -102,7 +124,7 @@ export default {
     }
   }
   @keyframes scroll{
-    from {transform: translateX(750px);opacity: 1;}
+    from {transform: translateX(100vw);opacity: 1;}
     to {transform: translateX(-100%);opacity: 1;}
   }
 </style>

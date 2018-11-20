@@ -5,7 +5,10 @@
           :key=item.id
           :class="[item.id === currentId ? 'active' : '']"
       >
+      <div class="userImg ignore">
         <img :src="item.img" alt="">
+        <span class="floatTip" v-show="item.offline">离线</span>    
+      </div>
         <p class="ignore">{{ item.name }}</p>
         <p class="ignore">{{ item.score }}</p>
       </li>
@@ -34,6 +37,7 @@ export default {
     &.active{
       img{border: 1px solid #fff;}
     }
+    text-align: center;
   }
   img{
     width: 80px;
@@ -44,6 +48,21 @@ export default {
   p{
     text-align: center;
 
+  }
+  .userImg{
+    position: relative;
+    display: inline-block;
+  }
+  .floatTip{
+    background: rgba(0,0,0,0.7);
+    color:#fff;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-block;
+    text-align: center;
+    line-height: 80px;
   }
   .ignore{
     font-size: 14px;

@@ -13,6 +13,9 @@ export default new Vuex.Store({
       console.log(user)
       state.user = user
       LS.saveUser(user)
+    },
+    CHANGE_USER_STATUS (state, status){
+      state.user.status = status
     }
   },
   getters: {

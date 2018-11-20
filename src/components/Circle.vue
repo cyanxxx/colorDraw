@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import {FREE, GAMING, LEAVING} from '../utils/constant'
 export default {
   data() {
     return{
@@ -37,7 +38,7 @@ export default {
       return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1;
     },
     canJoin() {
-      return this.user && this.user.status == 'free'
+      return this.user && this.user.status == FREE
     },
     canExit() {
       return this.user && this.user.roomId == this.room.roomId;
@@ -73,7 +74,7 @@ export default {
         return {
           roomId:null,
           userList:[],
-          status:""
+          status:FREE
         }
       }
     },
@@ -86,7 +87,8 @@ export default {
       this.$ws.sendMsg({}, 'startGame')
     },
     join() {
-      this.$ws.sendMsg({roomId:this.room.roomId},'join');
+      this.$emit('join-room',this.room.roomId)
+      
     },
     exit() {
       this.$ws.sendMsg({},'exitRoom');
