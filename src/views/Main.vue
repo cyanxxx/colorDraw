@@ -31,25 +31,22 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
-          if(!this.hasRoomList){
-            this.roomLists = data.roomLists
-          }else{
-              //新增的那个人数据，如果是同id就改状态，都会放入用户列表
-            this.roomLists.forEach((room) =>{
-              if(room.roomId == data.roomData.roomId){
-                //加入新成员
-                room.userList.push(data.uerData)
-                //添加用户数据
-                if(this.user.id == data.userData.id){
-                  //并记录下他在哪个房间
-                  this.room = data.roomData
-                  //直接改状态
-                  this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
-                }
-              }
-            })
+        console.log(data.roomId)
+        //新增的那个人数据，如果是同id就改状态，都会放入用户列表
+        this.roomLists.forEach((room) =>{
+          if(room.roomId == data.roomId){
+            //加入新成员
+            room.userList.push(data.userData)
+            console.log(room.userList)
+            //添加用户数据
+            if(this.user.id == data.userData.id){
+              //并记录下他在哪个房间
+              this.room = data.roomId
+              //直接改状态
+              this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
+            }
           }
-        
+        })
         },
         sbLeaveRoom(data) {
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
