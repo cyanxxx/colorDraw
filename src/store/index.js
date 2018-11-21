@@ -10,12 +10,13 @@ export default new Vuex.Store({
   },
   mutations: {
     SAVE_USER (state, user) {
-      console.log(user)
+      // console.log(user)
       state.user = user
       LS.saveUser(user)
     },
-    CHANGE_USER_STATUS (state, status){
-      state.user.status = status
+    CHANGE_USER_STATUS (state, data){
+      if(data.roomId)state.user.roomId = data.roomId
+      state.user.status = data.status
     }
   },
   getters: {

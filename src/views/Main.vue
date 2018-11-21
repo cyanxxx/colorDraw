@@ -9,9 +9,7 @@
          @touchmove ="doAction('move', $event)"
          @touchend = "doAction('end', $event)" >
       <div class="container clearFix" ref="roomBox">
-        <circle-room class="circle green" :room = "roomLists[0]" @join-room='join'></circle-room>
-        <circle-room class="circle blue" :room = "roomLists[1]"></circle-room>
-        <circle-room class="circle red" :room = "roomLists[2]"></circle-room>
+        <circle-room v-if = "roomLists.length>0" v-for="(room, index) in roomLists" :key="room.id" class="circle" :class="theme[index]" :room="room" @join-room='join'></circle-room>
       </div>
     </div>
   </div>
@@ -20,7 +18,7 @@
 <script>
 import CircleRoom from '../components/Circle'
 import MyHeader from '../components/MyHeader'
-import { mapMutations } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import { FREE } from '@/utils/constant'
 export default {
   components:{
@@ -31,20 +29,21 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
-        console.log(data.roomId)
+        console.log(data.roomId, data.userData.id)
         //新增的那个人数据，如果是同id就改状态，都会放入用户列表
         this.roomLists.forEach((room) =>{
-          if(room.roomId == data.roomId){
+          if(this.user.id == data.userData.id && room.roomId == data.roomId){
+              //直接改状态
+              console.log(data.roomId)
+              this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
+              room.userList.push(this.user)
+            }
+          else if(room.roomId == data.roomId){
             //加入新成员
             room.userList.push(data.userData)
             console.log(room.userList)
             //添加用户数据
-            if(this.user.id == data.userData.id){
-              //并记录下他在哪个房间
-              this.room = data.roomId
-              //直接改状态
-              this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
-            }
+            
           }
         })
         },
@@ -55,7 +54,10 @@ export default {
           this.$router.replace({name:'room',params:{id:data.roomId}})
         },
         exitRoom(data) {
-          this.CHANGE_USER_STATUS(FREE)
+          this.CHANGE_USER_STATUS({atatus: FREE})
+        },
+        changeUserStatus(data) {
+          this.CHANGE_USER_STATUS(data)
         }
       },
       roomLists:[],
@@ -66,6 +68,7 @@ export default {
       startTime:null,
       endTime:null,
       left:null,
+      theme: ['green' ,'blue', 'red']
     }
   },
   created() {
@@ -80,14 +83,9 @@ export default {
       });
   },
   computed:{
-    user() {
-      return this.$store.getters.user;
-    },
+    ...mapGetters(['user']),
     userName() {
       return this.user && this.user.name;
-    },
-    hasRoomList() {
-      return this.roomLists.length > 0
     }
   },
   methods:{
@@ -96,7 +94,7 @@ export default {
 
     },
     join(roomId) {
-      this.$ws.sendMsg({roomId, firstTime: this.hasRoomList},'join');
+      this.$ws.sendMsg({roomId},'join');
     },
     getLeft() {
       var el = this.$refs.roomBox;

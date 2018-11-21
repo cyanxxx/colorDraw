@@ -21,10 +21,10 @@ export default new Router({
       component:Room,
       //开始游戏
       beforeEnter: (to, from, next)=>{
-        if(store.getters.status === 'GAMING'){
+        if(store.getters.user.status === GAMING){
           next()
         }else{
-          next({path:"/"})
+          next({path:'/'})
         }
       }
     },

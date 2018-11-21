@@ -35,6 +35,7 @@ export default {
     },
     canStart() {
       //当前房号跟用户所在房间符合
+      console.log(!!this.user,!!(this.user.roomId == this.room.roomId),!!(this.room.userList.length >1))
       return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1;
     },
     canJoin() {
@@ -45,14 +46,13 @@ export default {
     },
     length() {
       //样式处理
-
       return this.room.userList.length;
     }
   },
   watch:{
-    length(val, ol) {
-      console.log(val);
-      this.$nextTick(function(){
+    length:{
+      handler: function(){
+        this.$nextTick(function(){
         var arr = Array.prototype.slice.call(document.querySelectorAll('.userInfo'));
         var len = arr.length;
         console.log(arr);
@@ -64,6 +64,8 @@ export default {
             console.log(el.style.transform);//rotate(360/${len}*${i})
         })
       })
+    },
+    immediate: true
 
     }
   },
