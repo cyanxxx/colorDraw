@@ -1,10 +1,10 @@
 <template lang="html">
   <div id="room">
-    <my-header class="theme">
+    <my-header class="theme" ref="header">
       <p class="fl">{{(iscurrentPlay ? '请画:' : '提示:' )}}{{gameData.key}} {{tip}}</p>
       <p class="fr">{{countTime}}</p>
     </my-header>
-    <draw :canDraw = "iscurrentPlay" ref="draw"></draw>
+    <draw :canDraw = "iscurrentPlay" ref="draw" :height=canvasHeight></draw>
     <float-bar class="theme" v-show="currentPlayerTip == 'game' && gameData.currentPlayer.id != user.id">
       <p>轮到:{{gameData.currentPlayer.name}}画</p>
     </float-bar>
@@ -16,7 +16,7 @@
                :playerLists="lists"
                :imgLists = "imgMap"
      />
-     <footer class='bottom'>
+     <footer class='bottom' ref="btn">
        <member class="theme" :lists = "gameData.playerList" :currentId = "gameData.currentPlayer.id"></member>
        <comment :msgData="comMes" @send-msg = "wsMsg" class="comment"></comment>
      </footer>
@@ -62,13 +62,14 @@ export default {
         status:'',
         playerList:[
           {id:1,name:'hauhua',score:1,offline:true,img:pic},
-          {id:1,name:'hauhua',score:1}
+          {id:2,name:'hauhua',score:1}
         ],
         key:''
       },
       currentPlayerTip:false,
       imgMap:[],
       countTime:60,
+      canvasHeight:0,
       lists:[], //总分排名
       // socketEvents:{
       //   timeOut(time) {
@@ -138,15 +139,20 @@ export default {
   },
   computed:{
     ...mapGetters(['user']),
-    // iscurrentPlay() {
-    //   if(this.gameData.currentPlayer){
-    //     return this.user.id == this.gameData.currentPlayer.id
-    //   }
-    // }
+    iscurrentPlay() {
+      // if(this.gameData.currentPlayer){
+      //   return this.user.id == this.gameData.currentPlayer.id
+      // }
+      return true
+    }
   },
   created() {
     //var id = this.user.id;
     // this.$ws.sendMsg({id},'beginGame')
+  },
+  mounted() {
+    console.log(this.$refs.header.$el,this.$refs.btn)
+    this.canvasHeight = window.innerHeight - this.$refs.btn.offsetHeight -this.$refs.header.$el.offsetHeight
   },
   methods: {
     // wsMsg(data) {

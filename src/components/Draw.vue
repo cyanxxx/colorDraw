@@ -72,18 +72,22 @@ export default {
     }
   },
   props:{
-    canDraw:Boolean
+    canDraw:Boolean,
+    height: Number
   },
   mounted() {
-    this.canvas = this.$refs.canvas;
-    this.ctx = this.canvas.getContext('2d');
-    this.width = document.body.clientWidth;
-    this.height = this.canvas.parentElement.clientHeight;
-    this.canvas.height = this.height;
-    this.canvas.width = this.width;
-    this.left = this.canvas.getBoundingClientRect().left;
-    this.top = this.canvas.getBoundingClientRect().top;
-    this.saveData();
+    this.$nextTick(()=>{
+       this.canvas = this.$refs.canvas;
+      this.ctx = this.canvas.getContext('2d');
+      this.width = document.body.clientWidth;
+      // this.height = this.canvas.parentElement.clientHeight;
+      this.canvas.height = this.height;
+      this.canvas.width = this.width;
+      this.left = this.canvas.getBoundingClientRect().left;
+      this.top = this.canvas.getBoundingClientRect().top;
+      this.saveData();
+    })
+   
   },
   watch:{
     historyIndex () {
@@ -214,8 +218,8 @@ export default {
 
 <style lang="scss">
 #draw{
-  height: 910px;
   position: relative;
+  font-size: 0;
   .tool{
     position: absolute;
     padding: 16px;
