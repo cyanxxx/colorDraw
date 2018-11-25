@@ -21,6 +21,7 @@ export default new Vuex.Store({
   },
   getters: {
     user: state => {
+      LS.saveUser(state.user)
       return state.user
     }
   }

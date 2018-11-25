@@ -1,17 +1,16 @@
 <template lang="html">
-  <div class="bottom">
-    <div id="tool">
-      <button class="colorBtn" @click = "open = true" :style='{background:currentColor}'></button>
-      <input type="range"
-              v-model="line"
-              min = 1
-              max = 15
-      />
+  <div id="tool" class="clearFix">
+    <button class="colorBtn" @click = "open = true" :style='{background:currentColor}'></button>
+    <input class="lineChoose" type="range"
+            v-model="line"
+            min = 1
+            max = 15
+    />
+    <div class="btnGroup">
       <div class="icon iconfont icon-houtui ignore" :class="{active:canBackward}" @click="backward"></div>
       <div class="icon iconfont icon-qianjin ignore" :class="{active:canForward}" @click="forward"></div>
       <div class="icon iconfont icon-lajixiang1 ignore" @click="reset"></div>
     </div>
-
     <div class="layer" v-show = "open" @click.self="open = false">
       <color-control @change-color="change"
                       class="modal"
@@ -19,7 +18,6 @@
       />
     </div>
   </div>
-
 
 </template>
 
@@ -78,10 +76,15 @@ export default {
     vertical-align: middle;
   }
   #tool{
-    vertical-align: middle;
+    width: 100%;
   }
-  input{
+  .lineChoose{
     vertical-align: middle;
+    margin-left: 16px;
+  }
+  .btnGroup{
+    float: right;
+    line-height: 82px;
   }
   .icon{
     display: inline-block;

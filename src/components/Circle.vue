@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import {FREE, GAMING, LEAVING} from '../utils/constant'
+import {USER_FREE, USER_WAITING, ROOM_GAMING} from '../utils/constant'
 export default {
   data() {
     return{
@@ -35,14 +35,13 @@ export default {
     },
     canStart() {
       //当前房号跟用户所在房间符合
-      console.log(!!this.user,!!(this.user.roomId == this.room.roomId),!!(this.room.userList.length >1))
-      return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1;
+      return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1 && this.room.status !== ROOM_GAMING;
     },
     canJoin() {
-      return this.user && this.user.status == FREE
+      return this.user && this.user.status == USER_FREE && this.room.status !== ROOM_GAMING
     },
     canExit() {
-      return this.user && this.user.roomId == this.room.roomId;
+      return this.user && this.user.status == USER_WAITING &&this.user.roomId == this.room.roomId;
     },
     length() {
       //样式处理
@@ -55,18 +54,15 @@ export default {
         this.$nextTick(function(){
         var arr = Array.prototype.slice.call(document.querySelectorAll('.userInfo'));
         var len = arr.length;
-        console.log(arr);
         var r = this.circleR;
         arr.forEach(function(el,i) {
           //translate(-50%,-50%)
           el.style.transform = `translate(-50%,-50%) rotate(${360/len*(i+1)}deg) translateY(-121px) rotate(${-360/len*(i+1)}deg)`;
           //console.log(`translate(-50%,-50%) rotate(${360/len*i}deg) translateY(-121px) rotate(${360/len*i}deg)`)
-            console.log(el.style.transform);//rotate(360/${len}*${i})
         })
       })
     },
-    immediate: true
-
+      immediate: true
     }
   },
   props:{
@@ -93,7 +89,7 @@ export default {
       
     },
     exit() {
-      this.$ws.sendMsg({},'exitRoom');
+      this.$emit('exit-room',this.room.roomId)
     }
   }
 

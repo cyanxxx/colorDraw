@@ -9,7 +9,10 @@
          @touchmove ="doAction('move', $event)"
          @touchend = "doAction('end', $event)" >
       <div class="container clearFix" ref="roomBox">
-        <circle-room v-if = "roomLists.length>0" v-for="(room, index) in roomLists" :key="room.id" class="circle" :class="theme[index]" :room="room" @join-room='join'></circle-room>
+        <circle-room v-if = "roomLists.length>0" v-for="(room, index) in roomLists" 
+                     :key="room.id" class="circle" :class="theme[index]" :room="room" 
+                     @join-room='join'
+                     @exit-room='exit' />
       </div>
     </div>
   </div>
@@ -19,7 +22,7 @@
 import CircleRoom from '../components/Circle'
 import MyHeader from '../components/MyHeader'
 import { mapGetters, mapMutations } from 'vuex';
-import { FREE } from '@/utils/constant'
+import { USER_FREE, USER_GAMING } from '@/utils/constant'
 export default {
   components:{
     CircleRoom,
@@ -32,7 +35,12 @@ export default {
         console.log(data.roomId, data.userData.id)
         //新增的那个人数据，如果是同id就改状态，都会放入用户列表
         this.roomLists.forEach((room) =>{
-          if(this.user.id == data.userData.id && room.roomId == data.roomId){
+          if(this.firstTimeGetRoom && this.user.id == data.userData.id && room.roomId == data.roomId){
+            room.userList = data.userList
+            this.firstTimeGetRoom = false
+            this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
+          }
+          else if(this.user.id == data.userData.id && room.roomId == data.roomId){
               //直接改状态
               console.log(data.roomId)
               this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
@@ -51,10 +59,11 @@ export default {
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
         },
         startGame(data) {
+          this.CHANGE_USER_STATUS({status: USER_GAMING})
           this.$router.replace({name:'room',params:{id:data.roomId}})
         },
         exitRoom(data) {
-          this.CHANGE_USER_STATUS({atatus: FREE})
+          this.CHANGE_USER_STATUS({status: USER_FREE,roomId:data.roomId})
         },
         changeUserStatus(data) {
           this.CHANGE_USER_STATUS(data)
@@ -68,6 +77,7 @@ export default {
       startTime:null,
       endTime:null,
       left:null,
+      firstTimeGetRoom: true,
       theme: ['green' ,'blue', 'red']
     }
   },
@@ -75,12 +85,12 @@ export default {
     this.$bar.on();
     this.$tip.msg('获取房间中...')
     //加载
-      this.$ws.request({},'getRoomData').then((data) => {
-        this.roomLists = data;
-        this.getLeft();
-        this.$bar.off();
-        this.$tip.finish()
-      });
+    this.$ws.request({},'getRoomData').then((data) => {
+      this.roomLists = data;
+      this.getLeft();
+      this.$bar.off();
+      this.$tip.finish()
+    });
   },
   computed:{
     ...mapGetters(['user']),
@@ -94,12 +104,15 @@ export default {
 
     },
     join(roomId) {
-      this.$ws.sendMsg({roomId},'join');
+      this.$ws.sendMsg({roomId, firstTimeGetRoom: this.firstTimeGetRoom},'join')
+    },
+    exit(roomId) {
+      this.$ws.sendMsg({},'exitRoom');
+      this.firstTimeGetRoom = true
     },
     getLeft() {
       var el = this.$refs.roomBox;
       var left = parseFloat(window.getComputedStyle(el).left);
-      console.log(left)
       this.left = left;
       this.$refs.roomBox.style.left = 0 + 'px';
     },
@@ -115,7 +128,7 @@ export default {
     getDirection(bp,ap){
       var x = ap.x - bp.x;
       var y = ap.y - bp.y;
-      var angel = Math.atan2(y,x) * 180 /Math.PI;
+      var angel = Math.atan2(y,x) * 180 / Math.PI;
       if(angel >= -45 && angel <= 45){
         return 'right'
       }else if(angel >= 135 || angel <= -135){

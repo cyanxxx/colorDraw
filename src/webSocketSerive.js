@@ -7,7 +7,7 @@ const options = {
 
 export default class WebSocketSerive{
   constructor(config) {
-    this.ws = new window.WebSocket(options.path1);
+    this.ws = new window.WebSocket(options.path2);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
     this.ws.onopen = ()=>{
@@ -16,7 +16,6 @@ export default class WebSocketSerive{
   }
 
   sendMsg(data, type) {
-    console.log(data, type)
     var parseData = JSON.stringify({data, type});
 
     this.waitForConnection(()=>{
@@ -40,7 +39,6 @@ export default class WebSocketSerive{
           if (error === true) {
             reject(data)
           }
-          console.log(data)
           resolve(data)
         })
         this.sendMsg(data, type)
@@ -63,7 +61,6 @@ export default class WebSocketSerive{
   //监听ws发来的数据
 
   getWsMes(data){
-    // console.log(data.data)
     var json = JSON.parse(data.data);
     this.events[json.type](json.data);   //调用相关函数，并放入数据
   }

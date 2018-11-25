@@ -15,6 +15,7 @@
         <img :src="img">
       </dd>
     </dl>
+    <button class="exixBtn" @click="$emit('back-to-lobby')">返回至大厅</button>
   </div>
 </template>
 
@@ -87,5 +88,13 @@ export default {
       margin-bottom: 16px;
     }
   }
-
+  .exixBtn{
+    margin-top: 26px;
+    float: right;
+    background: #fff;
+    padding: 10px 16px;
+    border: 0;
+    outline: 0;
+    border-radius: 3px;
+  }
 </style>

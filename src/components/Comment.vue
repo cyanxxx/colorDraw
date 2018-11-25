@@ -31,10 +31,14 @@ export default {
     //     }
     //   },
     // }   1 0   2 1  3 2      3 - 2 = 1
-    msgData: function(newVal, oldVal){
-      var domArr = Array.prototype.slice.call(newVal);
-      if(newVal.length > oldVal.length){
-        this.initAnim(domArr.slice(newVal.length-oldVal.length + 1))
+    msgData:function(newVal, oldVal){
+      console.log(newVal)
+      if(newVal.length > 0){
+        this.$nextTick(()=>{
+          var domArr = Array.prototype.slice.call(this.$refs.msgLists.children);
+          this.initAnim(domArr)
+        })
+        
       }
     }
   },
@@ -44,8 +48,8 @@ export default {
     }
   },
   mounted() {
-    var domArr = Array.prototype.slice.call(this.$refs.msgLists.children);
-    this.initAnim(domArr)
+    // var domArr = Array.prototype.slice.call(this.$refs.msgLists.children);
+    // this.initAnim(domArr)
   },
   methods:{
     //1.新增数据加样式  2  3
@@ -53,12 +57,11 @@ export default {
     initAnim(domArr) {
       console.log(domArr)
       domArr.forEach((el, i )=>{
-        console.log(el,i)
         el.classList.add('active')
         el.style.animationDelay = i*2 +'s'
         if(i===domArr.length-1){
           el.addEventListener('webkitAnimationEnd',()=>{
-            this.msgData = [];
+            this.$emit('empty-msg');
           })
         }
       })
