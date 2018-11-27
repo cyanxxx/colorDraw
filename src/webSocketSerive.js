@@ -1,13 +1,13 @@
 import store from './store'
 
 const options = {
-  path1:' ws://192.168.0.150:9090',
+  path1:' ws://192.168.0.233:9090',
   path2:' ws://192.168.1.107:9090',
 }
 
 export default class WebSocketSerive{
   constructor(config) {
-    this.ws = new window.WebSocket(options.path2);
+    this.ws = new window.WebSocket(options.path1);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
     this.ws.onopen = ()=>{

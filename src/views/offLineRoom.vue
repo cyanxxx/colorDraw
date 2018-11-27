@@ -17,7 +17,7 @@
                :imgLists = "imgMap"
      />
      <footer class='bottom' ref="btn">
-       <member class="theme" :lists = "gameData.playerList" :currentId = "gameData.currentPlayer.id"></member>
+       <member class="theme" :lists = "gameData.playerList" :currentId = 2 ></member>
        <comment :msgData="comMes" @send-msg = "wsMsg" class="comment"></comment>
      </footer>
     <div class="laywer" v-show = "gameData.status == 'over' || gameData.status == 'finish'"></div>
@@ -62,7 +62,7 @@ export default {
         status:'',
         playerList:[
           {id:1,name:'hauhua',score:1,offline:true,img:pic},
-          {id:2,name:'hauhua',score:1}
+          {id:2,name:'hauhua',score:1,img:pic}
         ],
         key:''
       },
