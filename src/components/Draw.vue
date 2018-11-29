@@ -60,10 +60,11 @@ export default {
           this.drawImage(data);
         },
         sendOfflineImg() {
-          this.$ws.send({dataUrl: this.canvas.toDataURL()}, 'sendOfflineImg')
+          console.log(this.canvas.toDataURL())
+          this.$ws.sendMsg({dataUrl: this.canvas.toDataURL()}, 'sendOfflineImg')
         },
         getImage(data) {
-          this.$ws.send({offlineId: data.offlineId, dataUrl: this.canvas.toDataURL()}, 'saveImg')
+          this.$ws.sendMsg({offlineId: data.offlineId, dataUrl: this.canvas.toDataURL()}, 'saveImg')
         }
       },
       ctx:null,
