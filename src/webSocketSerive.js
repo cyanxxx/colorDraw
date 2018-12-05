@@ -1,7 +1,7 @@
 import store from './store'
 
 const options = {
-  path1: 'ws://localhost:9090',
+  path1: 'ws://68.168.136.230:9090',
   path2: 'ws://192.168.1.107:9090',
 }
 
