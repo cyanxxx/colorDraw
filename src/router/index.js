@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Room from '../views/Room.vue'
-import OfflineRoom from '../views/OfflineRoom.vue'
+// import OfflineRoom from '../views/OfflineRoom.vue'
 import Main from '../views/Main.vue'
 import store from '../store'
 import { USER_GAMING } from '../utils/constant'
@@ -31,10 +31,10 @@ export default new Router({
         }
       }
     },
-    {
-      path:'/offlineRoom:id',
-      name:"offlineRoom",
-      component:OfflineRoom,
-    }
+    // {
+    //   path:'/offlineRoom:id',
+    //   name:"offlineRoom",
+    //   component:OfflineRoom,
+    // }
   ]
 })

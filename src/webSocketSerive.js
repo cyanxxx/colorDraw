@@ -1,8 +1,8 @@
 import store from './store'
 
 const options = {
-  path1:' ws://192.168.0.233:9090',
-  path2:' ws://192.168.1.107:9090',
+  path1: 'ws://localhost:9090',
+  path2: 'ws://192.168.1.107:9090',
 }
 
 export default class WebSocketSerive{
@@ -47,7 +47,7 @@ export default class WebSocketSerive{
       }
     })
   }
-
+  //注册相关函数
   on(type,fn) {
     this.events[type] = fn;
   }
@@ -59,7 +59,6 @@ export default class WebSocketSerive{
   }
 
   //监听ws发来的数据
-
   getWsMes(data){
     var json = JSON.parse(data.data);
     this.events[json.type](json.data);   //调用相关函数，并放入数据

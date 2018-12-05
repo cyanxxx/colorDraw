@@ -35,7 +35,7 @@ import Comment from '../components/Comment.vue'
 import Draw from '../components/Draw.vue'
 import FloatBar from '../components/FloatBar.vue'
 import GameOver from '../components/GameOver.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   components:{
@@ -86,6 +86,9 @@ export default {
         },
         reconnect(data) {
           this.gameData = data
+        },
+        changeUserStatus(data) {
+          this.CHANGE_USER_STATUS(data)
         },
         //有人离线和有人重连回来
         refreshOneStatus(data) {
@@ -145,6 +148,7 @@ export default {
     this.$ws.sendMsg({id},'beginGame')
   },
   methods: {
+    ...mapMutations(['CHANGE_USER_STATUS']),
     wsMsg(data) {
       this.$ws.sendMsg(data, 'checkAnswer')
     },
