@@ -7,7 +7,7 @@ const options = {
 
 export default class WebSocketSerive{
   constructor(config) {
-    this.ws = new window.WebSocket(options.path2);
+    this.ws = new window.WebSocket(options.path1);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
     this.ws.onopen = ()=>{

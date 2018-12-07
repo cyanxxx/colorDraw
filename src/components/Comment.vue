@@ -40,7 +40,7 @@ export default {
     this.throttle = throttle(()=>{
         this.domData.push(this.msgData.shift())
         this.len = this.msgData.length;
-        },5000)
+        },1000)
   },
   methods:{
     send(msg) {
