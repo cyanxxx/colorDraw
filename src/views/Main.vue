@@ -35,6 +35,7 @@ export default {
         //新增的那个人数据，如果是同id就改状态，都会放入用户列表
         this.roomLists.forEach((room) =>{
           if(this.firstTimeGetRoom && this.user.id == data.userData.id && room.roomId == data.roomId){
+            room.ownerId = data.ownerId
             room.userList = data.userList
             this.firstTimeGetRoom = false
             this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
@@ -54,6 +55,7 @@ export default {
         },
         sbLeaveRoom(data) {
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
+          this.roomLists[data.roomIndex].ownerId = data.ownerId;
           this.CHANGE_ACTION_STATUS(true)
         },
         startGame(data) {
@@ -64,6 +66,7 @@ export default {
         exitRoom(data) {
           this.CHANGE_USER_STATUS({status: USER_FREE,roomId:data.roomId})
           this.CHANGE_ACTION_STATUS(true)
+          this.firstTimeGetRoom = false
         },
         changeUserStatus(data) {
           this.CHANGE_USER_STATUS(data)

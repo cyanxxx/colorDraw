@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import {USER_FREE, USER_WAITING, ROOM_FREE, ROOM_GAMING} from '../utils/constant'
+import { USER_FREE, USER_WAITING, ROOM_FREE, ROOM_GAMING } from '../utils/constant'
 import { mapGetters, mapMutations } from 'vuex'
 export default {
   data() {
@@ -37,7 +37,7 @@ export default {
     },
     canStart() {
       //当前房号跟用户所在房间符合
-      return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1 && this.room.status !== ROOM_GAMING;
+      return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1 && this.room.status !== ROOM_GAMING && this.room.ownerId && this.room.ownerId === this.user.id;
     },
     canJoin() {
       return this.user && this.user.status == USER_FREE && this.room.status !== ROOM_GAMING
