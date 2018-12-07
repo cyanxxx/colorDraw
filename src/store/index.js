@@ -6,7 +6,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: LS.getUser() || null
+    user: LS.getUser() || null,
+    canAction: true
   },
   mutations: {
     SAVE_USER (state, user) {
@@ -17,12 +18,18 @@ export default new Vuex.Store({
     CHANGE_USER_STATUS (state, data){
       if(data.roomId)state.user.roomId = data.roomId
       state.user.status = data.status
+    },
+    CHANGE_ACTION_STATUS(state, status){
+      state.canAction = status;
     }
   },
   getters: {
     user: state => {
       LS.saveUser(state.user)
       return state.user
+    },
+    canAction: state => {
+      return state.canAction
     }
   }
 })

@@ -32,7 +32,6 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
-        console.log(data.roomId, data.userData.id)
         //新增的那个人数据，如果是同id就改状态，都会放入用户列表
         this.roomLists.forEach((room) =>{
           if(this.firstTimeGetRoom && this.user.id == data.userData.id && room.roomId == data.roomId){
@@ -41,8 +40,6 @@ export default {
             this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
           }
           else if(this.user.id == data.userData.id && room.roomId == data.roomId){
-              //直接改状态
-              console.log(data.roomId)
               this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
               room.userList.push(this.user)
             }
@@ -57,13 +54,16 @@ export default {
         },
         sbLeaveRoom(data) {
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
+          this.CHANGE_ACTION_STATUS(true)
         },
         startGame(data) {
           this.CHANGE_USER_STATUS({status: USER_GAMING})
           this.$router.replace({name:'room',params:{id:data.roomId}})
+          this.CHANGE_ACTION_STATUS(true)
         },
         exitRoom(data) {
           this.CHANGE_USER_STATUS({status: USER_FREE,roomId:data.roomId})
+          this.CHANGE_ACTION_STATUS(true)
         },
         changeUserStatus(data) {
           this.CHANGE_USER_STATUS(data)
@@ -99,7 +99,7 @@ export default {
     }
   },
   methods:{
-    ...mapMutations(['CHANGE_USER_STATUS']),
+    ...mapMutations(['CHANGE_USER_STATUS', 'CHANGE_ACTION_STATUS']),
     getUserRoom() {
 
     },
@@ -136,12 +136,15 @@ export default {
       }
     },
     translateRoom(type){
+      //当前左边距
       var left = parseFloat(this.$refs.roomBox.style.left);
       switch(type){
         case 'left':
+          if(left < this.left)break;
           this.$refs.roomBox.style.left = left + this.left +'px'
           break;
         case  'right':
+          if(left > this.left)break;
           this.$refs.roomBox.style.left = left - this.left +'px'
           break;
       }

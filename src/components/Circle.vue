@@ -2,13 +2,13 @@
   <div id="circle" ref="c">
     <div class="middle">
       <p>{{room.userList.length}}</p>
-      <button type="button" :class="{disable: !canStart}" :disabled="!canStart" @click="gotoRoom">
+      <button type="button" :class="{disable: !canStart}" :disabled="!canStart && !canAction" @click="doAction('start')">
         START
       </button>
-      <button type="button" :class="{disable: !canJoin}" :disabled="!canJoin" @click="join">
+      <button type="button" :class="{disable: !canJoin}" :disabled="!canJoin && !canAction" @click="doAction('join')">
         JOIN
       </button>
-      <button type="button" :class="{disable: !canExit}" :disabled="!canExit" @click="exit">
+      <button type="button" :class="{disable: !canExit}" :disabled="!canExit && !canAction" @click="doAction('exit')">
         EXIT
       </button>
     </div>
@@ -22,14 +22,16 @@
 </template>
 
 <script>
-import {USER_FREE, USER_WAITING, ROOM_GAMING} from '../utils/constant'
+import {USER_FREE, USER_WAITING, ROOM_FREE, ROOM_GAMING} from '../utils/constant'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   data() {
     return{
-      circleR:0
+      circleR:0,
     }
   },
   computed:{
+    ...mapGetters(['canAction']),
     user() {
       return this.$store.getters.user;
     },
@@ -56,9 +58,7 @@ export default {
         var len = arr.length;
         var r = this.circleR;
         arr.forEach(function(el,i) {
-          //translate(-50%,-50%)
           el.style.transform = `translate(-50%,-50%) rotate(${360/len*(i+1)}deg) translateY(-121px) rotate(${-360/len*(i+1)}deg)`;
-          //console.log(`translate(-50%,-50%) rotate(${360/len*i}deg) translateY(-121px) rotate(${360/len*i}deg)`)
         })
       })
     },
@@ -72,7 +72,7 @@ export default {
         return {
           roomId:null,
           userList:[],
-          status:FREE
+          status:ROOM_FREE
         }
       }
     },
@@ -81,7 +81,13 @@ export default {
     this.circleR = this.$refs.c.offsetWidth / 2;
   },
   methods:{
-    gotoRoom() {
+    ...mapMutations(['CHANGE_ACTION_STATUS']),
+    doAction(action) {
+      if(!this[action])return;
+      this.CHANGE_ACTION_STATUS(false);
+      this[action]();
+    },
+    start() {
       this.$ws.sendMsg({}, 'startGame')
     },
     join() {
