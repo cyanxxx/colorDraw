@@ -34,26 +34,20 @@ export default {
         newUserJoin(data) {
         //新增的那个人数据，如果是同id就改状态，都会放入用户列表
         this.roomLists.forEach((room) =>{
-          if(this.firstTimeGetRoom && this.user.id == data.userData.id && room.roomId == data.roomId){
+          if(this.user.id == data.userData.id && room.roomId == data.roomId){
             room.ownerId = data.ownerId
             room.userList = data.userList
-            this.firstTimeGetRoom = false
             this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
           }
-          else if(this.user.id == data.userData.id && room.roomId == data.roomId){
-              this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
-              room.userList.push(this.user)
-            }
           else if(room.roomId == data.roomId){
             //加入新成员
             room.userList.push(data.userData)
             console.log(room.userList)
-            //添加用户数据
-            
           }
         })
         },
         sbLeaveRoom(data) {
+          console.log(this.roomLists[data.roomIndex].userList,data.userIndex)
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
           this.roomLists[data.roomIndex].ownerId = data.ownerId;
           this.CHANGE_ACTION_STATUS(true)
@@ -66,7 +60,6 @@ export default {
         exitRoom(data) {
           this.CHANGE_USER_STATUS({status: USER_FREE,roomId:data.roomId})
           this.CHANGE_ACTION_STATUS(true)
-          this.firstTimeGetRoom = false
         },
         changeUserStatus(data) {
           this.CHANGE_USER_STATUS(data)
@@ -80,7 +73,6 @@ export default {
       startTime:null,
       endTime:null,
       left:null,
-      firstTimeGetRoom: true,
       theme: ['green' ,'blue', 'red']
     }
   },
@@ -107,11 +99,10 @@ export default {
 
     },
     join(roomId) {
-      this.$ws.sendMsg({roomId, firstTimeGetRoom: this.firstTimeGetRoom},'join')
+      this.$ws.sendMsg({roomId},'join')
     },
     exit(roomId) {
       this.$ws.sendMsg({},'exitRoom');
-      this.firstTimeGetRoom = true
     },
     getLeft() {
       var el = this.$refs.roomBox;

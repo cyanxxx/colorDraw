@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import LS from './utils/LocalStorage'
 import webSocketSerive from './webSocketSerive'
 import bar from './bar'
 import tip from './tip'

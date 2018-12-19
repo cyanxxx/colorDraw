@@ -7,7 +7,18 @@
 <script>
 import gobal from './assets/gobal.scss'
 export default {
-  name: 'App'
+  name: 'App',
+  mounted() {
+    document.addEventListener('visibilitychange', ()=>{
+    var isHidden = document.hidden;
+    if (isHidden) {
+      console.log('hidden')
+     this.$ws.sendMsg(null,'close')
+    } else {
+     location.reload();
+    }
+    });
+  }
 }
 </script>
 
