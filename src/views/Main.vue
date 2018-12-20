@@ -9,9 +9,10 @@
          @touchmove ="doAction('move', $event)"
          @touchend = "doAction('end', $event)" >
       <div class="container clearFix" ref="roomBox">
-        <circle-room class="circle green" :room = "roomLists[0]" @join-room='join'></circle-room>
-        <circle-room class="circle blue" :room = "roomLists[1]"></circle-room>
-        <circle-room class="circle red" :room = "roomLists[2]"></circle-room>
+        <circle-room v-if = "roomLists.length>0" v-for="(room, index) in roomLists" 
+                     :key="room.id" class="circle" :class="theme[index]" :room="room" 
+                     @join-room='join'
+                     @exit-room='exit' />
       </div>
     </div>
   </div>
@@ -20,8 +21,8 @@
 <script>
 import CircleRoom from '../components/Circle'
 import MyHeader from '../components/MyHeader'
-import { mapMutations } from 'vuex';
-import { FREE } from '@/utils/constant'
+import { mapGetters, mapMutations } from 'vuex';
+import { USER_FREE, USER_GAMING } from '@/utils/constant'
 export default {
   components:{
     CircleRoom,
@@ -31,31 +32,37 @@ export default {
     return{
       socketEvents:{
         newUserJoin(data) {
-        console.log(data.roomId)
         //新增的那个人数据，如果是同id就改状态，都会放入用户列表
         this.roomLists.forEach((room) =>{
-          if(room.roomId == data.roomId){
+          if(this.user.id == data.userData.id && room.roomId == data.roomId){
+            room.ownerId = data.ownerId
+            room.userList = data.userList
+            this.$store.commit('CHANGE_USER_STATUS',{status: data.userData.status,roomId: data.roomId})
+          }
+          else if(room.roomId == data.roomId){
             //加入新成员
             room.userList.push(data.userData)
             console.log(room.userList)
-            //添加用户数据
-            if(this.user.id == data.userData.id){
-              //并记录下他在哪个房间
-              this.room = data.roomId
-              //直接改状态
-              this.$store.commit('CHANGE_USER_STATUS',data.userData.status);
-            }
           }
         })
         },
         sbLeaveRoom(data) {
+          console.log(this.roomLists[data.roomIndex].userList,data.userIndex)
           this.roomLists[data.roomIndex].userList.splice(data.userIndex,1);
+          this.roomLists[data.roomIndex].ownerId = data.ownerId;
+          this.CHANGE_ACTION_STATUS(true)
         },
         startGame(data) {
+          this.CHANGE_USER_STATUS({status: USER_GAMING})
           this.$router.replace({name:'room',params:{id:data.roomId}})
+          this.CHANGE_ACTION_STATUS(true)
         },
         exitRoom(data) {
-          this.CHANGE_USER_STATUS(FREE)
+          this.CHANGE_USER_STATUS({status: USER_FREE,roomId:data.roomId})
+          this.CHANGE_ACTION_STATUS(true)
+        },
+        changeUserStatus(data) {
+          this.CHANGE_USER_STATUS(data)
         }
       },
       roomLists:[],
@@ -66,42 +73,40 @@ export default {
       startTime:null,
       endTime:null,
       left:null,
+      theme: ['green' ,'blue', 'red']
     }
   },
   created() {
     this.$bar.on();
     this.$tip.msg('获取房间中...')
     //加载
-      this.$ws.request({},'getRoomData').then((data) => {
-        this.roomLists = data;
-        this.getLeft();
-        this.$bar.off();
-        this.$tip.finish()
-      });
+    this.$ws.request({},'getRoomData').then((data) => {
+      this.roomLists = data;
+      this.getLeft();
+      this.$bar.off();
+      this.$tip.finish()
+    });
   },
   computed:{
-    user() {
-      return this.$store.getters.user;
-    },
+    ...mapGetters(['user']),
     userName() {
       return this.user && this.user.name;
-    },
-    hasRoomList() {
-      return this.roomLists.length > 0
     }
   },
   methods:{
-    ...mapMutations(['CHANGE_USER_STATUS']),
+    ...mapMutations(['CHANGE_USER_STATUS', 'CHANGE_ACTION_STATUS']),
     getUserRoom() {
 
     },
     join(roomId) {
-      this.$ws.sendMsg({roomId, firstTime: this.hasRoomList},'join');
+      this.$ws.sendMsg({roomId},'join')
+    },
+    exit(roomId) {
+      this.$ws.sendMsg({},'exitRoom');
     },
     getLeft() {
       var el = this.$refs.roomBox;
       var left = parseFloat(window.getComputedStyle(el).left);
-      console.log(left)
       this.left = left;
       this.$refs.roomBox.style.left = 0 + 'px';
     },
@@ -117,7 +122,7 @@ export default {
     getDirection(bp,ap){
       var x = ap.x - bp.x;
       var y = ap.y - bp.y;
-      var angel = Math.atan2(y,x) * 180 /Math.PI;
+      var angel = Math.atan2(y,x) * 180 / Math.PI;
       if(angel >= -45 && angel <= 45){
         return 'right'
       }else if(angel >= 135 || angel <= -135){
@@ -125,12 +130,15 @@ export default {
       }
     },
     translateRoom(type){
+      //当前左边距
       var left = parseFloat(this.$refs.roomBox.style.left);
       switch(type){
         case 'left':
+          if(left < this.left)break;
           this.$refs.roomBox.style.left = left + this.left +'px'
           break;
         case  'right':
+          if(left > this.left)break;
           this.$refs.roomBox.style.left = left - this.left +'px'
           break;
       }

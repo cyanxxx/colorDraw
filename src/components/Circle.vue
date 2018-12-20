@@ -2,13 +2,13 @@
   <div id="circle" ref="c">
     <div class="middle">
       <p>{{room.userList.length}}</p>
-      <button type="button" :class="{disable: !canStart}" :disabled="!canStart" @click="gotoRoom">
+      <button type="button" :class="{disable: !canStart}" :disabled="!canStart && !canAction" @click="doAction('start')">
         START
       </button>
-      <button type="button" :class="{disable: !canJoin}" :disabled="!canJoin" @click="join">
+      <button type="button" :class="{disable: !canJoin}" :disabled="!canJoin && !canAction" @click="doAction('join')">
         JOIN
       </button>
-      <button type="button" :class="{disable: !canExit}" :disabled="!canExit" @click="exit">
+      <button type="button" :class="{disable: !canExit}" :disabled="!canExit && !canAction" @click="doAction('exit')">
         EXIT
       </button>
     </div>
@@ -22,49 +22,47 @@
 </template>
 
 <script>
-import {FREE, GAMING, LEAVING} from '../utils/constant'
+import { USER_FREE, USER_WAITING, ROOM_FREE, ROOM_GAMING } from '../utils/constant'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   data() {
     return{
-      circleR:0
+      circleR:0,
     }
   },
   computed:{
+    ...mapGetters(['canAction']),
     user() {
       return this.$store.getters.user;
     },
     canStart() {
       //当前房号跟用户所在房间符合
-      return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1;
+      return this.user && this.user.roomId == this.room.roomId && this.room.userList.length >1 && this.room.status !== ROOM_GAMING && this.room.ownerId && this.room.ownerId === this.user.id;
     },
     canJoin() {
-      return this.user && this.user.status == FREE
+      return this.user && this.user.status == USER_FREE && this.room.status !== ROOM_GAMING
     },
     canExit() {
-      return this.user && this.user.roomId == this.room.roomId;
+      return this.user && this.user.status == USER_WAITING &&this.user.roomId == this.room.roomId;
     },
     length() {
       //样式处理
-
       return this.room.userList.length;
     }
   },
   watch:{
-    length(val, ol) {
-      console.log(val);
-      this.$nextTick(function(){
+    length:{
+      handler: function(){
+        this.$nextTick(function(){
         var arr = Array.prototype.slice.call(document.querySelectorAll('.userInfo'));
         var len = arr.length;
-        console.log(arr);
         var r = this.circleR;
         arr.forEach(function(el,i) {
-          //translate(-50%,-50%)
           el.style.transform = `translate(-50%,-50%) rotate(${360/len*(i+1)}deg) translateY(-121px) rotate(${-360/len*(i+1)}deg)`;
-          //console.log(`translate(-50%,-50%) rotate(${360/len*i}deg) translateY(-121px) rotate(${360/len*i}deg)`)
-            console.log(el.style.transform);//rotate(360/${len}*${i})
         })
       })
-
+    },
+      immediate: true
     }
   },
   props:{
@@ -74,7 +72,7 @@ export default {
         return {
           roomId:null,
           userList:[],
-          status:FREE
+          status:ROOM_FREE
         }
       }
     },
@@ -83,7 +81,13 @@ export default {
     this.circleR = this.$refs.c.offsetWidth / 2;
   },
   methods:{
-    gotoRoom() {
+    ...mapMutations(['CHANGE_ACTION_STATUS']),
+    doAction(action) {
+      if(!this[action])return;
+      this.CHANGE_ACTION_STATUS(false);
+      this[action]();
+    },
+    start() {
       this.$ws.sendMsg({}, 'startGame')
     },
     join() {
@@ -91,7 +95,7 @@ export default {
       
     },
     exit() {
-      this.$ws.sendMsg({},'exitRoom');
+      this.$emit('exit-room',this.room.roomId)
     }
   }
 

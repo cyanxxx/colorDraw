@@ -1,8 +1,8 @@
 import store from './store'
 
 const options = {
-  path1:' ws://192.168.0.150:9090',
-  path2:' ws://192.168.1.107:9090',
+  path1: 'ws://68.168.136.230:9090',
+  path2: 'ws://192.168.1.107:9090',
 }
 
 export default class WebSocketSerive{
@@ -16,7 +16,6 @@ export default class WebSocketSerive{
   }
 
   sendMsg(data, type) {
-    console.log(data, type)
     var parseData = JSON.stringify({data, type});
 
     this.waitForConnection(()=>{
@@ -40,7 +39,6 @@ export default class WebSocketSerive{
           if (error === true) {
             reject(data)
           }
-          console.log(data)
           resolve(data)
         })
         this.sendMsg(data, type)
@@ -49,7 +47,7 @@ export default class WebSocketSerive{
       }
     })
   }
-
+  //注册相关函数
   on(type,fn) {
     this.events[type] = fn;
   }
@@ -61,9 +59,7 @@ export default class WebSocketSerive{
   }
 
   //监听ws发来的数据
-
   getWsMes(data){
-    console.log(data.data)
     var json = JSON.parse(data.data);
     this.events[json.type](json.data);   //调用相关函数，并放入数据
   }

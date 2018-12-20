@@ -1,7 +1,7 @@
 <template lang="html">
   <div id="comment" class="clearFix">
     <div class="showmsg ignore" ref="msgLists">
-      <span class="msg" v-for="msg in msgData">
+      <span class="msg active" v-for="msg in domData">
         {{ msg }}
       </span>
     </div>
@@ -15,54 +15,34 @@
 </template>
 
 <script>
+import throttle from '@/utils/throttle'
 export default {
   data() {
     return {
       text:"",
-      aniamted: false,
-      aniName: 'active'
-    }
-  },
-  watch:{
-    // msgBox:{
-    //   handler(){
-    //     if(this.msgBox.length){
-    //       this.initAnim()
-    //     }
-    //   },
-    // }   1 0   2 1  3 2      3 - 2 = 1
-    msgData: function(newVal, oldVal){
-      var domArr = Array.prototype.slice.call(newVal);
-      if(newVal.length > oldVal.length){
-        this.initAnim(domArr.slice(newVal.length-oldVal.length + 1))
-      }
+      domData: [],
+      len:0,
+      throttle: null
     }
   },
   props:{
-    msgData:{
-      type:Array
+    msgData: Array,
+  },
+  watch: {
+    msgData(){
+      if(this.msgData.length>this.len){
+        this.throttle()
+      }
+      
     }
   },
-  mounted() {
-    var domArr = Array.prototype.slice.call(this.$refs.msgLists.children);
-    this.initAnim(domArr)
+  created() {
+    this.throttle = throttle(()=>{
+        this.domData.push(this.msgData.shift())
+        this.len = this.msgData.length;
+        },1000)
   },
   methods:{
-    //1.新增数据加样式  2  3
-    //2.删去dom节点
-    initAnim(domArr) {
-      console.log(domArr)
-      domArr.forEach((el, i )=>{
-        console.log(el,i)
-        el.classList.add('active')
-        el.style.animationDelay = i*2 +'s'
-        if(i===domArr.length-1){
-          el.addEventListener('webkitAnimationEnd',()=>{
-            this.msgData = [];
-          })
-        }
-      })
-    },
     send(msg) {
       this.text = "";
       var data = {

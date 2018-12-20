@@ -3,7 +3,7 @@
     <ul>
       <li v-for="item in lists"
           :key=item.id
-          :class="[item.id === currentId ? 'active' : '']"
+          :class="[item.id === currentId ? 'active' : '']" class="ignore"
       >
       <div class="userImg ignore">
         <img :src="item.img" alt="">
@@ -31,11 +31,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$activeColor : #e2cd9c;
   li{
     display: inline-block;
     margin-right: 16px;
     &.active{
-      img{border: 1px solid #fff;}
+      color: $activeColor;
+      img{border: 1px solid $activeColor}
     }
     text-align: center;
   }

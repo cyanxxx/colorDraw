@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import LS from './utils/LocalStorage'
 import webSocketSerive from './webSocketSerive'
 import bar from './bar'
 import tip from './tip'
+var test = false
 router.beforeEach((to, from, next) => {
   bar.on()
   tip.msg('加载中...')
-  if(Vue.prototype.$ws){
+  if(Vue.prototype.$ws || test){
     next()
   }else{
     Vue.prototype.$ws = new webSocketSerive({
@@ -22,10 +22,12 @@ router.beforeEach((to, from, next) => {
           }else{
             //没过期返回状态
             if(data.inGame){
-              next({path: '/room', params: {id: data.roomId}})
-            }
-            //没在游戏中返回到大厅
+              console.log('hello')
+              next({name: 'room', params: {id: data.roomId}})
+            }else{
+              //没在游戏中返回到大厅
             next({path:'/'})
+            }
           }
         })
       }

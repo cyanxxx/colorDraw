@@ -1,40 +1,41 @@
 <template lang="html">
   <div id="room">
-    <my-header class="theme">
+    <my-header class="theme" ref="header">
       <p class="fl">{{(iscurrentPlay ? '请画:' : '提示:' )}}{{gameData.key}} {{tip}}</p>
       <p class="fr">{{countTime}}</p>
     </my-header>
-    <draw :canDraw = "iscurrentPlay" ref="draw"></draw>
-    <float-bar class="theme" v-show="currentPlayerTip && !iscurrentPlay">
+    <draw :canDraw = "iscurrentPlay" ref="draw" :height="canvasHeight"></draw>
+    <float-bar class="theme" v-show="!currentPlayerTip && !iscurrentPlay && gameData.status == ROUND_START">
       <p>轮到:{{gameData.currentPlayer.name}}画</p>
     </float-bar>
-    <float-bar class="theme" v-show="gameData.status == 'finish'">
+    <float-bar class="theme" v-show="gameData.status == ROUND_FINISH">
       <p>答案:{{key}}</p>
     </float-bar>
     <game-over class="theme"
-               v-show="gameData.status == 'over'"
+               v-show="gameData.status == GAME_OVER"
                :playerLists="lists"
                :imgLists = "imgMap"
+               @back-to-lobby="backToLobby"
      />
-     <footer class='bottom'>
+    <footer class='bottom' ref="btm">
        <member class="theme" :lists = "gameData.playerList" :currentId = "gameData.currentPlayer.id"></member>
-       <comment :msgData="comMes" @send-msg = "wsMsg" class="comment"></comment>
+       <comment :msgData="comMes" @send-msg = "wsMsg" @empty-msg="emptyMsg" class="comment"></comment>
      </footer>
-    <div class="laywer" v-show = "gameData.status == 'over' || gameData.status == 'finish'"></div>
+    <div class="laywer" v-show = "gameData.status == GAME_OVER || gameData.status == ROUND_FINISH"></div>
   </div>
 
 
 </template>
 
 <script>
-import {OVER, WAITING} from '@/utils/constant'
+import {GAME_OVER, ROUND_FINISH, ROUND_START, USER_RECONNECT, USER_LEAVING} from '@/utils/constant'
 import MyHeader from '../components/MyHeader.vue'
 import Member from '../components/Member.vue'
 import Comment from '../components/Comment.vue'
 import Draw from '../components/Draw.vue'
 import FloatBar from '../components/FloatBar.vue'
 import GameOver from '../components/GameOver.vue'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   components:{
@@ -65,6 +66,10 @@ export default {
       currentPlayerTip:false,
       imgMap:[],
       countTime:60,
+      canvasHeight:0,
+      GAME_OVER: GAME_OVER,
+      ROUND_START: ROUND_START,
+      ROUND_FINISH: ROUND_FINISH,
       lists:[], //总分排名
       socketEvents:{
         timeOut(time) {
@@ -82,16 +87,23 @@ export default {
         reconnect(data) {
           this.gameData = data
         },
+        changeUserStatus(data) {
+          this.CHANGE_USER_STATUS(data)
+        },
         //有人离线和有人重连回来
         refreshOneStatus(data) {
-          if(data.type === RECONNECT){
-            this.gameData.playerList.splice(data.userIndex,0,data.user)
-          }else if(data.type === LEAVING){
-            this.gameData.playerList.splice(data.userIndex,1,data.user)
+          if(data.type === USER_RECONNECT){
+            this.gameData.playerList[data.userIndex].offline = false
+          }else if(data.type === USER_LEAVING){
+            this.gameData.playerList[data.userIndex].offline = true
           }
         },
         getGameData(data) {
           this.gameData = data;
+          this.$nextTick(()=>{
+            this.canvasHeight = window.innerHeight - this.$refs.btm.offsetHeight -this.$refs.header.$el.offsetHeight
+            console.log( window.innerHeight ,this.$refs.btm.offsetHeight ,this.$refs.header.$el.offsetHeight)
+          })
           setTimeout(()=>{
             this.currentPlayerTip = true
           },3 * 1000);
@@ -126,8 +138,9 @@ export default {
     iscurrentPlay() {
       if(this.gameData.currentPlayer){
         return this.user.id == this.gameData.currentPlayer.id
+      }else{
+        return false
       }
-
     }
   },
   created() {
@@ -135,11 +148,17 @@ export default {
     this.$ws.sendMsg({id},'beginGame')
   },
   methods: {
+    ...mapMutations(['CHANGE_USER_STATUS']),
     wsMsg(data) {
       this.$ws.sendMsg(data, 'checkAnswer')
+    },
+    emptyMsg() {
+      this.comMes = [];
+    },
+    backToLobby() {
+      this.$router.push({name:'lobby'})
     }
   }
-
 }
 </script>
 

@@ -58,12 +58,18 @@ export default {
         },
         drawImage(data) {
           this.drawImage(data);
+        },
+        sendOfflineImg() {
+          console.log(this.canvas.toDataURL())
+          this.$ws.sendMsg({dataUrl: this.canvas.toDataURL()}, 'sendOfflineImg')
+        },
+        getImage(data) {
+          this.$ws.sendMsg({offlineId: data.offlineId, dataUrl: this.canvas.toDataURL()}, 'saveImg')
         }
       },
       ctx:null,
       left:0,
       top:0,
-      height:0,
       width:0,
       canvas:null,
       historyArr:[],
@@ -72,22 +78,25 @@ export default {
     }
   },
   props:{
-    canDraw:Boolean
+    canDraw:Boolean,
+    height: Number
   },
   mounted() {
-    this.canvas = this.$refs.canvas;
-    this.ctx = this.canvas.getContext('2d');
-    this.width = document.body.clientWidth;
-    this.height = this.canvas.parentElement.clientHeight;
-    this.canvas.height = this.height;
-    this.canvas.width = this.width;
-    this.left = this.canvas.getBoundingClientRect().left;
-    this.top = this.canvas.getBoundingClientRect().top;
-    this.saveData();
+    this.$nextTick(()=>{
+       this.canvas = this.$refs.canvas;
+      this.ctx = this.canvas.getContext('2d');
+      this.width = document.body.clientWidth;
+      // this.height = this.canvas.parentElement.clientHeight;
+      
+      this.canvas.width = this.width;
+      this.left = this.canvas.getBoundingClientRect().left;
+      this.top = this.canvas.getBoundingClientRect().top;
+      this.saveData();
+    })
+   
   },
   watch:{
     historyIndex () {
-      console.log(this.historyIndex)
       let data = this.historyArr[this.historyIndex]
       //调用前进后退才会进入
       if(this.repaint){
@@ -96,6 +105,11 @@ export default {
           this.sendImage(data)
         }
         this.repaint = false;
+      }
+    },
+    height (val) {
+      if(val > 0){
+        this.canvas.height = this.height;
       }
     }
   },
@@ -128,7 +142,6 @@ export default {
     },
     getPoint(e){
       var pos = e.touches[0];
-      console.log(pos)
       return{
         x:pos.clientX - this.left,
         y:pos.clientY - this.top
@@ -214,8 +227,8 @@ export default {
 
 <style lang="scss">
 #draw{
-  height: 910px;
   position: relative;
+  font-size: 0;
   .tool{
     position: absolute;
     padding: 16px;

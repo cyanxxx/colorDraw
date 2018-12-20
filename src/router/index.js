@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Room from '../views/Room.vue'
-import OfflineRoom from '../views/OfflineRoom.vue'
+// import OfflineRoom from '../views/OfflineRoom.vue'
 import Main from '../views/Main.vue'
 import store from '../store'
-import {GAMING} from '../utils/constant'
+import { USER_GAMING } from '../utils/constant'
 
 Vue.use(Router)
 
@@ -13,6 +13,7 @@ export default new Router({
   routes: [
     {
       path:'/',
+      name: 'lobby',
       component:Main
     },
     {
@@ -21,17 +22,19 @@ export default new Router({
       component:Room,
       //开始游戏
       beforeEnter: (to, from, next)=>{
-        if(store.getters.status === 'GAMING'){
+        console.log(store.getters.user.status)
+        if (store.getters.user.status === USER_GAMING) {
+          console.log('?')
           next()
         }else{
-          next({path:"/"})
+          next({path:'/'})
         }
       }
     },
-    {
-      path:'/offlineRoom:id',
-      name:"offlineRoom",
-      component:OfflineRoom,
-    }
+    // {
+    //   path:'/offlineRoom:id',
+    //   name:"offlineRoom",
+    //   component:OfflineRoom,
+    // }
   ]
 })
