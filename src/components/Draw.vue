@@ -186,8 +186,8 @@ export default {
     },
     reset() {
       this.clearImg();
-      this.historyIndex = -1;
-      this.saveData();
+      this.historyIndex = 0;
+      this.historyArr.splice(this.historyIndex + 1, this.historyArr.length)
     },
     clearImg() {
       this.ctx.clearRect(0, 0, this.width, this.height)

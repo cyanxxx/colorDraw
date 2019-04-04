@@ -1,8 +1,6 @@
-import store from './store'
-
 const options = {
   path1: 'ws://68.168.136.230:9090',
-  path2: 'ws://192.168.1.107:9090',
+  path2: 'ws://127.0.0.1:9090',
 }
 
 export default class WebSocketSerive{

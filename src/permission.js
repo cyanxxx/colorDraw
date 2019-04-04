@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import webSocketSerive from './webSocketSerive'
+import webSocketSerive from './webSocketServe'
 import bar from './bar'
 import tip from './tip'
 var test = false
@@ -22,7 +22,6 @@ router.beforeEach((to, from, next) => {
           }else{
             //没过期返回状态
             if(data.inGame){
-              console.log('hello')
               next({name: 'room', params: {id: data.roomId}})
             }else{
               //没在游戏中返回到大厅

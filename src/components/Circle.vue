@@ -56,9 +56,10 @@ export default {
         this.$nextTick(function(){
         var arr = Array.prototype.slice.call(document.querySelectorAll('.userInfo'));
         var len = arr.length;
-        var r = this.circleR;
+        var h = document.querySelectorAll('.userInfo')[0].clientHeight / 2
+        var r = -this.circleR + h;
         arr.forEach(function(el,i) {
-          el.style.transform = `translate(-50%,-50%) rotate(${360/len*(i+1)}deg) translateY(-121px) rotate(${-360/len*(i+1)}deg)`;
+          el.style.transform = `translate(-50%,-50%) rotate(${360/len*(i+1)}deg) translateY(${r}px) rotate(${-360/len*(i+1)}deg)`;
         })
       })
     },
