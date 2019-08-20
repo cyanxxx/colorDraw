@@ -23,7 +23,7 @@ npm run unit
 # run all tests
 npm test
 ```
-# 目录结构
+## 目录结构
 - `build` vue-cli的默认配置
 - `config` 
     -  `index` 在本地测试时，可以将host改成0.0.0.0可以让手机访问到只要在同一个路由器下，在ipconfig查看本机ip地址在手机输入该地址即可浏览
