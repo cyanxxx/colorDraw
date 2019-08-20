@@ -1,11 +1,6 @@
-const options = {
-  path1: 'ws://139.155.25.23:9090',
-  path2: 'ws://127.0.0.1:9090',
-}
-
 export default class WebSocketSerive{
   constructor(config) {
-    this.ws = new window.WebSocket(options.path2);
+    this.ws = new window.WebSocket(process.env.BASE_API);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
     this.ws.onopen = ()=>{
