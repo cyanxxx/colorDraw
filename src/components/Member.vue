@@ -17,7 +17,6 @@
 </template>
 
 <script>
-import userImg from '../assets/image/1.jpg'
 export default {
   data(){
     return{
