@@ -28,6 +28,7 @@ export default {
   data() {
     return{
       circleR:0,
+      event: null
     }
   },
   computed:{
@@ -80,7 +81,8 @@ export default {
     },
   },
   mounted() {
-    this.circleR = this.$refs.c.offsetWidth / 2;
+    this.calcCircleRadius()
+    window.addEventListener('resize', this.calcCircleRadius)
   },
   methods:{
     ...mapMutations(['CHANGE_ACTION_STATUS']),
@@ -98,7 +100,13 @@ export default {
     },
     exit() {
       this.$emit('exit-room',this.room.roomId)
-    }
+    },
+    calcCircleRadius() {
+      this.circleR = this.$refs.c.offsetWidth / 2;
+    },
+  },
+  beforDestroy() {
+     window.addEventListener('resize', this.calcCircleRadius)
   }
 
 }
