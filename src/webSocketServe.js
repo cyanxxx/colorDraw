@@ -1,6 +1,7 @@
 export default class WebSocketSerive{
   constructor(config) {
-    this.ws = new window.WebSocket(process.env.BASE_API);
+    const api = process.env.BASE_API || `ws://${window.location.hostname}:9090`
+    this.ws = new window.WebSocket(api);
     this.ws.onmessage = this.getWsMes.bind(this);
     this.events = {};
     this.ws.onopen = ()=>{
