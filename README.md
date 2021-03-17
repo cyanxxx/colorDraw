@@ -2,6 +2,9 @@
 
 > 你画我猜的手机版vue构建
 
+### 注意本地运行需要同时启动本地服务端
+https://github.com/cyanxxx/color-draw-server 
+
 ## Build Setup
 
 ``` bash
