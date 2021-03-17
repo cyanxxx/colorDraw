@@ -5,7 +5,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 import FastClick from 'fastclick'
-import permission from './permission'
+import './permission'
 
 
 Vue.config.productionTip = false
@@ -21,7 +21,7 @@ Vue.mixin({
       })
     }
   },
-  beforeDestory () {
+  beforeDestroy () {
     const events = this.socketEvents
     if (events) {
       Object.keys(events).forEach(k => {

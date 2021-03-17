@@ -1,6 +1,6 @@
 <template lang="html">
   <div id="tool" class="clearFix">
-    <button class="colorBtn" @click = "open = true" :style='{background:currentColor}'></button>
+    <button class="colorBtn" :style='{background:currentColor}' @click = "open = true"></button>
     <input class="lineChoose" type="range"
             v-model="line"
             min = 1
@@ -12,9 +12,9 @@
       <div class="icon iconfont icon-lajixiang1 ignore" @click="reset"></div>
     </div>
     <div class="layer" v-show = "open" @click.self="open = false">
-      <color-control @change-color="change"
-                      class="modal"
-                      :lineColor.sync="lineColor"
+      <color-control class="modal"
+                     :lineColor.sync="lineColor" 
+                     @change-color="change"
       />
     </div>
   </div>
@@ -23,7 +23,7 @@
 
 <script>
 import ColorControl from './ColorControl.vue'
-import iconfont from '../assets/iconfont.css'
+import '../assets/iconfont.css'
 export default {
   components:{
     ColorControl

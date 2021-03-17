@@ -1,14 +1,17 @@
 <template lang="html">
   <div id="draw">
-    <canvas ref="canvas"
-            v-if = "canDraw"
+    <canvas v-if = "canDraw"
+            class = "canvas ignore"
+            ref="canvas"
             @touchstart = "doAction('start', $event)"
             @touchmove = "doAction('move', $event)"
             @touchend = "doAction('end')"
-            class = "canvas ignore"
+            
     />
     <canvas v-else class = "canvas ignore" ref="canvas"></canvas>
-    <tool :lineWidth = "lineWidth"
+    <tool v-if = "canDraw"
+          class = "tool"
+          :lineWidth = "lineWidth"
           :lineColor ="lineColor"
           :canBackward ="canBackward"
           :canForward ="canForward"
@@ -17,8 +20,6 @@
           @reset = "doAction('reset')"
           @forward = "doAction('forward')"
           @backward = "doAction('backward')"
-          class = "tool"
-          v-if = "canDraw"
     />
   </div>
 

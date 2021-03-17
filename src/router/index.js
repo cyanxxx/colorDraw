@@ -22,9 +22,7 @@ export default new Router({
       component:Room,
       //开始游戏
       beforeEnter: (to, from, next)=>{
-        console.log(store.getters.user.status)
         if (store.getters.user.status === USER_GAMING) {
-          console.log('?')
           next()
         }else{
           next({path:'/'})

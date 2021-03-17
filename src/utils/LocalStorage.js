@@ -16,11 +16,10 @@ export default{
   },
   clearUser() {
     try{
-      let json = localStorage.getItem('user')
+      localStorage.removeItem('user')
     }
     catch(e){
       return null
     }
-    localStorage.removeItem('user')
   }
 }
