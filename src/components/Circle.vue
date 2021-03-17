@@ -52,7 +52,8 @@ export default {
   },
   watch:{
     length:{
-      handler: function(){
+      handler: function(val){
+        if(!val)return
         this.$nextTick(function(){
         var arr = Array.prototype.slice.call(document.querySelectorAll('.userInfo'));
         var len = arr.length;
